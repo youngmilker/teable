@@ -109,13 +109,9 @@ describe('OpenAPI AttachmentController (e2e)', () => {
     });
     eventEmitterService.eventEmitter.removeAllListeners(Events.CROP_IMAGE);
     const record = await getRecord(table.id, table.records[0].id);
-    expect(record.data.fields[field.name] as IAttachmentCellValue[]).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          smThumbnailUrl: expect.any(String),
-          lgThumbnailUrl: expect.any(String),
-        }),
-      ])
-    );
+    const attachment = (record.data.fields[field.name] as IAttachmentCellValue)[0];
+    expect(attachment?.lgThumbnailUrl).toBe(attachment.presignedUrl);
+    expect(attachment?.smThumbnailUrl).toBeDefined();
+    expect(attachment.smThumbnailUrl).not.toBe(attachment.presignedUrl);
   });
 });
