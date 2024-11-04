@@ -103,7 +103,7 @@ export const RecordHistory = (props: IRecordHistoryProps) => {
           return (
             <div className="flex items-center gap-x-1">
               <Icon className="shrink-0" />
-              <OverflowTooltip text={fieldName} maxLine={1} className="flex-1 text-[13px]" />
+              <OverflowTooltip text={fieldName} ellipsis className="flex-1 text-[13px]" />
             </div>
           );
         },
@@ -120,7 +120,6 @@ export const RecordHistory = (props: IRecordHistoryProps) => {
                 <CellValue
                   value={before.data}
                   field={before.meta as IFieldInstance}
-                  maxLine={4}
                   className={actionVisible ? 'max-w-52' : 'max-w-[264px]'}
                 />
               ) : (
@@ -154,7 +153,6 @@ export const RecordHistory = (props: IRecordHistoryProps) => {
                 <CellValue
                   value={after.data}
                   field={after.meta as IFieldInstance}
-                  maxLine={4}
                   className={actionVisible ? 'max-w-52' : 'max-w-[264px]'}
                 />
               ) : (

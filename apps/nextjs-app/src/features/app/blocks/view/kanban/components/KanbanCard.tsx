@@ -63,7 +63,7 @@ export const KanbanCard = (props: IKanbanCardProps) => {
     if (primaryField == null) return t('untitled');
     const value = card.getCellValue(primaryField.id);
     if (value == null) return t('untitled');
-    return <CellValue field={primaryField} value={value} className="text-base" />;
+    return <CellValue field={primaryField} value={value} className="text-base" ellipsis />;
   }, [card, primaryField, t]);
 
   const onExpand = () => {
@@ -160,7 +160,7 @@ export const KanbanCard = (props: IKanbanCardProps) => {
                       <span className="text-xs">{name}</span>
                     </div>
                   )}
-                  <CellValue field={field} value={cellValue} maxLine={4} />
+                  <CellValue field={field} value={cellValue} />
                 </div>
               );
             })}
