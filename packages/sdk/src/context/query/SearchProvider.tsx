@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react';
 import { useCallback, useMemo, useState } from 'react';
+import { useLocalStorage } from 'react-use';
+import { LocalStorageKeys } from '../../config/local-storage-keys';
 import { SearchContext } from './SearchContext';
 
 export interface ISearchProviderProps {
@@ -9,24 +11,40 @@ export interface ISearchProviderProps {
 export const SearchProvider: React.FC<ISearchProviderProps> = ({ children }) => {
   const [fieldId, setFieldId] = useState<string | undefined>();
   const [value, setValue] = useState<string | undefined>();
+  const [hideNotMatchRow, setHideNotMatchRow] = useLocalStorage<boolean>(
+    LocalStorageKeys.SearchHideNotMatchRow,
+    false
+  );
 
   const reset = useCallback(() => {
     setFieldId(undefined);
     setValue(undefined);
   }, []);
 
-  const searchQuery = useMemo<[string, string] | [string] | undefined>(() => {
+  const searchQuery = useMemo<[string, string, boolean] | undefined>(() => {
     if (value && fieldId) {
       if (fieldId === 'all_fields') {
-        return [value];
+        // url deal undefined will throw it, so use '' instead
+        return [value, '', !!hideNotMatchRow];
       }
-      return [value, fieldId];
+      return [value, fieldId, !!hideNotMatchRow];
     }
     return undefined;
-  }, [fieldId, value]);
+  }, [fieldId, value, hideNotMatchRow]);
 
   return (
-    <SearchContext.Provider value={{ value, fieldId, searchQuery, setFieldId, setValue, reset }}>
+    <SearchContext.Provider
+      value={{
+        value,
+        fieldId,
+        searchQuery,
+        setFieldId,
+        setValue,
+        reset,
+        hideNotMatchRow,
+        setHideNotMatchRow,
+      }}
+    >
       {children}
     </SearchContext.Provider>
   );
