@@ -32,10 +32,18 @@ export function SearchButton({
     LocalStorageKeys.EnableGlobalSearch,
     false
   );
+  const [lsHideNotMatch, setLsHideNotMatchRow] = useLocalStorage<boolean>(
+    LocalStorageKeys.SearchHideNotMatchRow,
+    false
+  );
   const [searchFieldMapCache, setSearchFieldMap] = useLocalStorage<Record<string, string[]>>(
     LocalStorageKeys.TableSearchFieldsCache,
     {}
   );
+
+  useEffect(() => {
+    setHideNotMatchRow(lsHideNotMatch);
+  }, [lsHideNotMatch, setHideNotMatchRow]);
 
   useEffect(() => {
     if (!fieldId || fieldId === 'all_fields') {
@@ -96,6 +104,11 @@ export function SearchButton({
     setValue();
     setInputValue('');
   }, [cancel, setValue]);
+
+  useEffect(() => {
+    setActive(false);
+    resetSearch();
+  }, [resetSearch, view?.id]);
 
   useHotkeys<HTMLInputElement>(
     `esc`,
@@ -168,14 +181,14 @@ export function SearchButton({
             <span className="truncate">{searchHeader}</span>
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto min-w-64 p-1">
+        <PopoverContent className="max-w-96 p-1">
           {fieldId && tableId && (
             <SearchCommand
               value={fieldId}
               hideNotMatchRow={hideNotMatchRow}
               onChange={(fieldIds) => {
                 // switch to field
-                if (!fieldIds) {
+                if (!fieldIds || fields.length === 0) {
                   const newIds = searchFieldMapCache?.[tableId] || [fields[0].id];
                   setFieldId(newIds.join(','));
                   setEnableGlobalSearch(false);
@@ -191,6 +204,7 @@ export function SearchButton({
                 setFieldId(ids);
               }}
               onHideSwitchChange={(checked) => {
+                setLsHideNotMatchRow(checked);
                 setHideNotMatchRow(checked);
               }}
             />

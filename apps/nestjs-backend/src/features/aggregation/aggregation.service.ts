@@ -578,7 +578,7 @@ export class AggregationService {
     return groupPoints;
   }
 
-  public async getSearchCount(tableId: string, queryRo: ISearchCountRo) {
+  public async getSearchCount(tableId: string, queryRo: ISearchCountRo, projection?: string[]) {
     const { search, viewId } = queryRo;
     const { queryBuilder: viewRecordsQB } = await this.recordService.buildFilterSortQuery(
       tableId,
@@ -603,6 +603,14 @@ export class AggregationService {
           }
         });
       }
+    }
+
+    if (projection?.length) {
+      Object.keys(fieldInstanceMap).forEach((fieldId) => {
+        if (!projection.includes(fieldId)) {
+          delete fieldInstanceMapWithoutHiddenFields[fieldId];
+        }
+      });
     }
 
     const queryBuilder = this.knex
@@ -631,7 +639,11 @@ export class AggregationService {
     };
   }
 
-  public async getRecordIndexBySearchOrder(tableId: string, queryRo: ISearchIndexByQueryRo) {
+  public async getRecordIndexBySearchOrder(
+    tableId: string,
+    queryRo: ISearchIndexByQueryRo,
+    projection?: string[]
+  ) {
     const { search, index = 1, orderBy, groupBy, viewId } = queryRo;
     const dbTableName = await this.getDbTableName(this.prisma, tableId);
     const { fieldInstanceMap } = await this.getFieldsData(tableId, undefined, false);
@@ -657,6 +669,14 @@ export class AggregationService {
       }
     }
 
+    if (projection?.length) {
+      Object.keys(fieldInstanceMap).forEach((fieldId) => {
+        if (!projection.includes(fieldId)) {
+          delete fieldInstanceMapWithoutHiddenFields[fieldId];
+        }
+      });
+    }
+
     const fieldsWithOrder = Object.values(fieldInstanceMap)
       .filter((field) => {
         if (!viewColumnMeta) {
@@ -664,10 +684,16 @@ export class AggregationService {
         }
         return !viewColumnMeta?.[field.id]?.hidden;
       })
+      .filter((field) => {
+        if (!projection) {
+          return true;
+        }
+        return projection.includes(field.id);
+      })
       .map((field) => {
         return {
           ...field,
-          order: viewColumnMeta?.[field.id]?.order ?? 0,
+          order: viewColumnMeta?.[field.id]?.order ?? Number.MIN_SAFE_INTEGER,
         };
       })
       .sort((a, b) => a.order - b.order);
