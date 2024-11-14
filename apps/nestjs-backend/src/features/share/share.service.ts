@@ -9,7 +9,10 @@ import {
 import type { IFilter, IFieldVo, IViewVo, ILinkFieldOptions, StatisticsFunc } from '@teable/core';
 import { FieldKeyType, FieldType, ViewType } from '@teable/core';
 import { PrismaService } from '@teable/db-main-prisma';
+import { UploadType, ShareViewLinkRecordsType, PluginPosition } from '@teable/openapi';
 import {
+  type ISearchCountRo,
+  type ISearchIndexByQueryRo,
   type ShareViewFormSubmitRo,
   type ShareViewGetVo,
   type IShareViewRowCountRo,
@@ -22,9 +25,6 @@ import {
   type IShareViewLinkRecordsRo,
   type IRecordsVo,
   type IShareViewCollaboratorsRo,
-  UploadType,
-  ShareViewLinkRecordsType,
-  PluginPosition,
 } from '@teable/openapi';
 import { Knex } from 'knex';
 import { isEmpty, pick } from 'lodash';
@@ -300,7 +300,7 @@ export class ShareService {
       filter,
       take,
       skip,
-      search: search ? [search, lookupFieldId] : undefined,
+      search: search ? [search, lookupFieldId, true] : undefined,
       projection: [lookupFieldId],
       fieldKeyType: FieldKeyType.Id,
       filterLinkCellCandidate: field.id,
@@ -315,7 +315,7 @@ export class ShareService {
     return this.recordService.getRecords(foreignTableId, {
       skip,
       take,
-      search: search ? [search, lookupFieldId] : undefined,
+      search: search ? [search, lookupFieldId, true] : undefined,
       fieldKeyType: FieldKeyType.Id,
       projection: [lookupFieldId],
       filterLinkCellSelected: fieldId,
@@ -456,5 +456,13 @@ export class ShareService {
     });
     const list = await this.collaboratorService.getListByBase(baseId);
     return list.map((item) => pick(item, 'userId', 'email', 'userName', 'avatar'));
+  }
+
+  async getShareSearchCount(tableId: string, query: ISearchCountRo) {
+    return this.aggregationService.getSearchCount(tableId, query);
+  }
+
+  async getShareSearchIndex(tableId: string, query: ISearchIndexByQueryRo) {
+    return this.aggregationService.getRecordIndexBySearchOrder(tableId, query);
   }
 }

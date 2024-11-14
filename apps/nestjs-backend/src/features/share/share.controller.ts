@@ -9,6 +9,7 @@ import {
   Get,
   Body,
   Query,
+  Param,
 } from '@nestjs/common';
 import { IGetFieldsQuery, getFieldsQuerySchema } from '@teable/core';
 import {
@@ -28,6 +29,10 @@ import {
   IShareViewCollaboratorsRo,
   getRecordsRoSchema,
   IGetRecordsRo,
+  searchCountRoSchema,
+  ISearchCountRo,
+  ISearchIndexByQueryRo,
+  searchIndexByQueryRoSchema,
 } from '@teable/openapi';
 import type {
   IRecord,
@@ -38,6 +43,8 @@ import type {
   ShareViewGetVo,
   IShareViewLinkRecordsVo,
   IShareViewCollaboratorsVo,
+  ISearchCountVo,
+  ISearchIndexVo,
 } from '@teable/openapi';
 import { Response } from 'express';
 import { ZodValidationPipe } from '../../zod.validation.pipe';
@@ -155,6 +162,28 @@ export class ShareController {
   ): Promise<IShareViewCollaboratorsVo> {
     const shareInfo = req.shareInfo as IShareViewInfo;
     return this.shareService.getViewCollaborators(shareInfo, query);
+  }
+
+  @UseGuards(ShareAuthGuard)
+  @Get('/:shareId/view/search-count')
+  async getSearchCount(
+    @Request() req: any,
+    @Query(new ZodValidationPipe(searchCountRoSchema))
+    queryRo: ISearchCountRo
+  ): Promise<ISearchCountVo> {
+    const { tableId, view } = req.shareInfo as IShareViewInfo;
+    return this.shareService.getShareSearchCount(tableId, { ...queryRo, viewId: view?.id });
+  }
+
+  @UseGuards(ShareAuthGuard)
+  @Get('/:shareId/view/search-index')
+  async getSearchIndex(
+    @Request() req: any,
+    @Query(new ZodValidationPipe(searchIndexByQueryRoSchema))
+    queryRo: ISearchIndexByQueryRo
+  ): Promise<ISearchIndexVo> {
+    const { tableId, view } = req.shareInfo as IShareViewInfo;
+    return this.shareService.getShareSearchIndex(tableId, { ...queryRo, viewId: view?.id });
   }
 
   @UseGuards(ShareAuthGuard)
