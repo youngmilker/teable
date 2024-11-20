@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, BadRequestException, BadGatewayException } from '@nestjs/common';
 import type { IGridColumnMeta, IFilter, IGroup } from '@teable/core';
 import {
   FieldType,
@@ -22,7 +22,7 @@ import type {
 } from '@teable/openapi';
 import dayjs from 'dayjs';
 import { Knex } from 'knex';
-import { get, groupBy, isDate, isEmpty, keyBy } from 'lodash';
+import { get, groupBy, isDate, isEmpty, keyBy, orderBy } from 'lodash';
 import { InjectModel } from 'nest-knexjs';
 import { ClsService } from 'nestjs-cls';
 import { IThresholdConfig, ThresholdConfig } from '../../configs/threshold.config';
@@ -590,10 +590,15 @@ export class AggregationService {
     const { fieldInstanceMap } = await this.getFieldsData(tableId, undefined, false);
 
     if (!search) {
-      throw new Error('Search query is required');
+      throw new BadRequestException('Search query is required');
     }
 
-    const searchFields = await this.getSearchFields(fieldInstanceMap, search, viewId, projection);
+    const searchFields = await this.recordService.getSearchFields(
+      fieldInstanceMap,
+      search,
+      viewId,
+      projection
+    );
 
     const queryBuilder = this.knex(dbFieldName);
     this.dbProvider.searchCountQuery(queryBuilder, searchFields, search[0]);
@@ -617,15 +622,24 @@ export class AggregationService {
     queryRo: ISearchIndexByQueryRo,
     projection?: string[]
   ) {
-    const { search, index = 1, orderBy, filter, viewId, groupBy } = queryRo;
+    const { search, take, skip, orderBy, filter, viewId, groupBy } = queryRo;
     const dbTableName = await this.getDbTableName(this.prisma, tableId);
     const { fieldInstanceMap } = await this.getFieldsData(tableId, undefined, false);
 
-    if (!search) {
-      throw new Error('Search query is required');
+    if (take > 1000) {
+      throw new BadGatewayException('The maximum search index result is 1000');
     }
 
-    const searchFields = await this.getSearchFields(fieldInstanceMap, search, viewId, projection);
+    if (!search) {
+      throw new BadRequestException('Search query is required');
+    }
+
+    const searchFields = await this.recordService.getSearchFields(
+      fieldInstanceMap,
+      search,
+      viewId,
+      projection
+    );
 
     const { queryBuilder: viewRecordsQB } = await this.recordService.buildFilterSortQuery(
       tableId,
@@ -662,7 +676,8 @@ export class AggregationService {
     });
     cases.length && queryBuilder.orderByRaw(cases.join(','));
 
-    queryBuilder.limit(1).offset(index - 1);
+    queryBuilder.limit(take);
+    skip && queryBuilder.offset(skip);
 
     const sql = queryBuilder.toQuery();
 
@@ -673,22 +688,25 @@ export class AggregationService {
       return null;
     }
 
-    const recordId = result[0]?.__id;
+    const recordIds = result;
 
     // step 2. find the index in current view
     const indexQueryBuilder = this.knex
       .select('row_num')
+      .select('__id')
       .from((qb: Knex.QueryBuilder) => {
         qb.select('__id')
           .select(this.knex.client.raw('ROW_NUMBER() OVER () as row_num'))
           .from(viewRecordsQB.as('t'))
           .as('t1');
       })
-      .andWhere('__id', '=', recordId)
-      .first();
+      .whereIn(
+        '__id',
+        recordIds.map((record) => record.__id)
+      );
 
     // eslint-disable-next-line
-    const indexResult = await this.prisma.$queryRawUnsafe<{ row_num: number }[]>(
+    const indexResult = await this.prisma.$queryRawUnsafe<{ row_num: number; __id: string }[]>(
       indexQueryBuilder.toQuery()
     );
 
@@ -696,84 +714,17 @@ export class AggregationService {
       return null;
     }
 
-    return {
-      index: Number(indexResult[0]?.row_num),
-      fieldId: result[0]?.fieldId,
-    };
-  }
+    const indexResultMap = keyBy(indexResult, '__id');
 
-  private async getSearchFields(
-    originFieldInstanceMap: Record<string, IFieldInstance>,
-    search?: [string, string?, boolean?],
-    viewId?: string,
-    projection?: string[]
-  ) {
-    let viewColumnMeta: IGridColumnMeta | null = null;
-    const fieldInstanceMap = { ...originFieldInstanceMap };
-
-    if (viewId) {
-      const { columnMeta: viewColumnRawMeta } =
-        (await this.prisma.view.findUnique({
-          where: { id: viewId, deletedTime: null },
-          select: { columnMeta: true },
-        })) || {};
-
-      viewColumnMeta = viewColumnRawMeta ? JSON.parse(viewColumnRawMeta) : null;
-
-      if (viewColumnMeta) {
-        Object.entries(viewColumnMeta).forEach(([key, value]) => {
-          if (get(value, ['hidden'])) {
-            delete fieldInstanceMap[key];
-          }
-        });
+    return result.map((item) => {
+      const index = Number(indexResultMap[item.__id]?.row_num);
+      if (isNaN(index)) {
+        throw new Error('Index not found');
       }
-    }
-
-    if (projection?.length) {
-      Object.keys(fieldInstanceMap).forEach((fieldId) => {
-        if (!projection.includes(fieldId)) {
-          delete fieldInstanceMap[fieldId];
-        }
-      });
-    }
-
-    return Object.values(fieldInstanceMap)
-      .map((field) => ({
-        ...field,
-        isStructuredCellValue: field.isStructuredCellValue,
-      }))
-      .filter((field) => {
-        if (!viewColumnMeta) {
-          return true;
-        }
-        return !viewColumnMeta?.[field.id]?.hidden;
-      })
-      .filter((field) => {
-        if (!projection) {
-          return true;
-        }
-        return projection.includes(field.id);
-      })
-      .filter((field) => {
-        if (!search?.[1]) {
-          return true;
-        }
-
-        const searchArr = search[1].split(',');
-        return searchArr.includes(field.id);
-      })
-      .filter((field) => {
-        if (field.type === FieldType.Checkbox) {
-          return false;
-        }
-        return true;
-      })
-      .map((field) => {
-        return {
-          ...field,
-          order: viewColumnMeta?.[field.id]?.order ?? Number.MIN_SAFE_INTEGER,
-        };
-      })
-      .sort((a, b) => a.order - b.order) as unknown as IFieldInstance[];
+      return {
+        index,
+        fieldId: item.fieldId,
+      };
+    });
   }
 }

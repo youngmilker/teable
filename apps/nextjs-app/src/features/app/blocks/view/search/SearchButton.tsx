@@ -30,6 +30,7 @@ export const SearchButton = (props: ISearchButtonProps) => {
   const [inputValue, setInputValue] = useState(value);
   const [isFocused, setIsFocused] = useState(false);
   const { t } = useTranslation(['common', 'table']);
+  const searchComposition = useRef(false);
   const ref = useRef<HTMLInputElement>(null);
   const { setSearchCursor } = useGridSearchStore();
   const [enableGlobalSearch, setEnableGlobalSearch] = useLocalStorage(
@@ -98,7 +99,7 @@ export const SearchButton = (props: ISearchButtonProps) => {
 
   const [, cancel] = useDebounce(
     () => {
-      setValue(inputValue);
+      !searchComposition?.current && setValue(inputValue);
     },
     500,
     [inputValue]
@@ -175,7 +176,7 @@ export const SearchButton = (props: ISearchButtonProps) => {
   return active ? (
     <div
       className={cn(
-        'left-6 top-60 flex h-7 shrink-0 items-center gap-1 overflow-hidden rounded-xl bg-background p-0 pr-[7px] text-xs border outline-muted-foreground',
+        'left-6 top-60 flex h-7 shrink-0 items-center gap-1 overflow-hidden rounded-xl bg-background p-0 pr-[7px] text-xs border outline-muted-foreground w-80',
         {
           outline: isFocused,
         }
@@ -183,7 +184,11 @@ export const SearchButton = (props: ISearchButtonProps) => {
     >
       <Popover modal>
         <PopoverTrigger asChild>
-          <Button variant="ghost" size={'xs'} className="max-w-40 truncate rounded-none border-r">
+          <Button
+            variant="ghost"
+            size={'xs'}
+            className="max-w-40 shrink-0 truncate rounded-none border-r"
+          >
             <span className="truncate">{searchHeader}</span>
           </Button>
         </PopoverTrigger>
@@ -217,44 +222,58 @@ export const SearchButton = (props: ISearchButtonProps) => {
           )}
         </PopoverContent>
       </Popover>
-      <input
-        ref={ref}
-        className="placeholder:text-muted-foregrounds flex w-32 rounded-md bg-transparent px-1 outline-none"
-        placeholder={t('actions.search')}
-        autoComplete="off"
-        autoCorrect="off"
-        spellCheck="false"
-        type="text"
-        value={inputValue || ''}
-        onChange={(e) => {
-          setInputValue(e.target.value);
-          if (e.target.value === '') {
-            setSearchCursor(null);
-          }
-        }}
-        onBlur={() => {
-          setIsFocused(false);
-        }}
-        onFocus={() => {
-          setIsFocused(true);
-        }}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') {
-            searchPaginationRef?.current?.nextPage();
-          }
-        }}
-      />
-      {view?.type === ViewType.Grid && (
-        <SearchCountPagination shareView={shareView} ref={searchPaginationRef} />
-      )}
-      <X
-        className="hover:text-primary-foregrounds size-4 cursor-pointer font-light"
-        onClick={() => {
-          resetSearch();
-          setActive(false);
-        }}
-      />
-      <Search className="size-4" />
+      <div className="flex flex-1 justify-between overflow-hidden">
+        <input
+          ref={ref}
+          className="placeholder:text-muted-foregrounds min-w-0 grow rounded-md bg-transparent px-1 outline-none"
+          placeholder={t('actions.search')}
+          autoComplete="off"
+          autoCorrect="off"
+          spellCheck="false"
+          type="text"
+          value={inputValue || ''}
+          onCompositionStart={() => {
+            searchComposition.current = true;
+          }}
+          onCompositionEnd={() => {
+            searchComposition.current = false;
+          }}
+          onChange={(e) => {
+            setInputValue(e.target.value);
+            if (e.target.value === '') {
+              setSearchCursor(null);
+            }
+          }}
+          onBlur={() => {
+            setIsFocused(false);
+          }}
+          onFocus={() => {
+            setIsFocused(true);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              const actionFn = e.shiftKey
+                ? searchPaginationRef?.current?.prevIndex
+                : searchPaginationRef?.current?.nextIndex;
+              actionFn?.();
+            }
+          }}
+        />
+        <div className="flex shrink-0 items-center">
+          {view?.type === ViewType.Grid && (
+            <SearchCountPagination shareView={shareView} ref={searchPaginationRef} />
+          )}
+
+          <X
+            className="hover:text-primary-foregrounds size-4 shrink-0 cursor-pointer font-light"
+            onClick={() => {
+              resetSearch();
+              setActive(false);
+            }}
+          />
+          <Search className="size-4 shrink-0" />
+        </div>
+      </div>
     </div>
   ) : (
     <ToolBarButton
