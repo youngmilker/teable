@@ -9,3 +9,4 @@ export * from './view-link-records';
 export * from './view-collaborators';
 export * from './view-search-count';
 export * from './view-search-index';
+export * from './view-calendar-daily-collection';

@@ -9,7 +9,6 @@ import {
   Get,
   Body,
   Query,
-  Param,
 } from '@nestjs/common';
 import { IGetFieldsQuery, getFieldsQuerySchema } from '@teable/core';
 import {
@@ -29,6 +28,8 @@ import {
   IShareViewCollaboratorsRo,
   getRecordsRoSchema,
   IGetRecordsRo,
+  shareViewCalendarDailyCollectionRoSchema,
+  IShareViewCalendarDailyCollectionRo,
   searchCountRoSchema,
   ISearchCountRo,
   ISearchIndexByQueryRo,
@@ -43,6 +44,7 @@ import type {
   ShareViewGetVo,
   IShareViewLinkRecordsVo,
   IShareViewCollaboratorsVo,
+  ICalendarDailyCollectionVo,
   ISearchCountVo,
   ISearchIndexVo,
 } from '@teable/openapi';
@@ -141,6 +143,17 @@ export class ShareController {
   ): Promise<IGroupPointsVo> {
     const shareInfo = req.shareInfo as IShareViewInfo;
     return this.shareService.getViewGroupPoints(shareInfo, query);
+  }
+
+  @UseGuards(ShareAuthGuard)
+  @Get('/:shareId/view/calendar-daily-collection')
+  async getViewCalendarDailyCollection(
+    @Request() req: any,
+    @Query(new ZodValidationPipe(shareViewCalendarDailyCollectionRoSchema))
+    query: IShareViewCalendarDailyCollectionRo
+  ): Promise<ICalendarDailyCollectionVo> {
+    const shareInfo = req.shareInfo as IShareViewInfo;
+    return this.shareService.getViewCalendarDailyCollection(shareInfo, query);
   }
 
   @UseGuards(ShareAuthGuard)

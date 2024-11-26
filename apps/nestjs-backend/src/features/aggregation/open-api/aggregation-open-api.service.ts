@@ -4,6 +4,8 @@ import { getValidStatisticFunc } from '@teable/core';
 import type {
   IAggregationRo,
   IAggregationVo,
+  ICalendarDailyCollectionRo,
+  ICalendarDailyCollectionVo,
   IGroupPointsRo,
   IGroupPointsVo,
   IQueryBaseRo,
@@ -57,6 +59,13 @@ export class AggregationOpenApiService {
 
   async getGroupPoints(tableId: string, query?: IGroupPointsRo): Promise<IGroupPointsVo> {
     return await this.aggregationService.getGroupPoints(tableId, query);
+  }
+
+  async getCalendarDailyCollection(
+    tableId: string,
+    query: ICalendarDailyCollectionRo
+  ): Promise<ICalendarDailyCollectionVo> {
+    return await this.aggregationService.getCalendarDailyCollection(tableId, query);
   }
 
   private async validFieldStats(

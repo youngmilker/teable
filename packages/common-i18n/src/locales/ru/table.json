@@ -406,6 +406,29 @@
       "duplicateCard": "Дублировать карточку"
     }
   },
+  "calendar": {
+    "toolbar": {
+      "config": "Настройка календаря",
+      "startDateField": "Начальная дата",
+      "endDateField": "Конечная дата",
+      "titleField": "Заголовок",
+      "colorField": "Цвет",
+      "colorType": "Отображение цвета",
+      "customColor": "Настроить цвет",
+      "alignWithRecords": "Соответствовать записям"
+    },
+    "placeholder": {
+      "selectColorField": "Выберите поле цвета"
+    },
+    "dialog": {
+      "startDate": "Начальная дата",
+      "endDate": "Конечная дата",
+      "notAdd": "Не добавлять",
+      "addDateField": "Добавить дату",
+      "content": "Создать календарный вид, и в таблице должно быть два поля даты: начальная дата и конечная дата"
+    },
+    "moreLinkText": "Показать все {{count}} записей"
+  },
   "menu": {
     "insertRecordAbove": "Вставить запись выше",
     "insertRecordBelow": "Вставить запись ниже",
@@ -440,7 +463,8 @@
       "table": "Табличный вид",
       "form": "Вид формы",
       "kanban": "Канбан-вид",
-      "gallery": "Галерея вид"
+      "gallery": "Галерея вид",
+      "calendar": "Календарь вид"
     },
     "crash": {
       "title": "Сбой!",

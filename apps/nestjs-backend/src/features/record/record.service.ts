@@ -422,7 +422,7 @@ export class RecordService {
       });
   }
 
-  private parseSearch(
+  public parseSearch(
     search: [string, string?, boolean?],
     fieldMap?: Record<string, IFieldInstance>
   ): [string, string?, boolean?] {
@@ -1061,7 +1061,7 @@ export class RecordService {
     await this.prismaService.txClient().$executeRawUnsafe(nativeQuery);
   }
 
-  private async getFieldsByProjection(
+  public async getFieldsByProjection(
     tableId: string,
     projection?: { [fieldNameOrId: string]: boolean },
     fieldKeyType: FieldKeyType = FieldKeyType.Id

@@ -10,21 +10,22 @@ import type { IFilter, IFieldVo, IViewVo, ILinkFieldOptions, StatisticsFunc } fr
 import { FieldKeyType, FieldType, ViewType } from '@teable/core';
 import { PrismaService } from '@teable/db-main-prisma';
 import { UploadType, ShareViewLinkRecordsType, PluginPosition } from '@teable/openapi';
-import {
-  type ISearchCountRo,
-  type ISearchIndexByQueryRo,
-  type ShareViewFormSubmitRo,
-  type ShareViewGetVo,
-  type IShareViewRowCountRo,
-  type IShareViewAggregationsRo,
-  type IRangesRo,
-  type IShareViewGroupPointsRo,
-  type IAggregationVo,
-  type IGroupPointsVo,
-  type IRowCountVo,
-  type IShareViewLinkRecordsRo,
-  type IRecordsVo,
-  type IShareViewCollaboratorsRo,
+import type {
+  IShareViewCalendarDailyCollectionRo,
+  ShareViewFormSubmitRo,
+  ShareViewGetVo,
+  IShareViewRowCountRo,
+  IShareViewAggregationsRo,
+  IRangesRo,
+  IShareViewGroupPointsRo,
+  IAggregationVo,
+  IGroupPointsVo,
+  IRowCountVo,
+  IShareViewLinkRecordsRo,
+  IRecordsVo,
+  IShareViewCollaboratorsRo,
+  ISearchCountRo,
+  ISearchIndexByQueryRo,
 } from '@teable/openapi';
 import { Knex } from 'knex';
 import { isEmpty, pick } from 'lodash';
@@ -464,5 +465,15 @@ export class ShareService {
 
   async getShareSearchIndex(tableId: string, query: ISearchIndexByQueryRo) {
     return this.aggregationService.getRecordIndexBySearchOrder(tableId, query);
+  }
+
+  async getViewCalendarDailyCollection(
+    shareInfo: IShareViewInfo,
+    query: IShareViewCalendarDailyCollectionRo
+  ) {
+    return this.aggregationService.getCalendarDailyCollection(shareInfo.tableId, {
+      ...query,
+      viewId: shareInfo.view?.id,
+    });
   }
 }

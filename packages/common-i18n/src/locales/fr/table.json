@@ -406,6 +406,29 @@
       "duplicateCard": "Dupliquer la carte"
     }
   },
+  "calendar": {
+    "toolbar": {
+      "config": "Configuration du calendrier",
+      "startDateField": "Champ de date de début",
+      "endDateField": "Champ de date de fin",
+      "titleField": "Champ de titre",
+      "colorField": "Champ de couleur",
+      "colorType": "Affichage de la couleur",
+      "customColor": "Personnaliser la couleur",
+      "alignWithRecords": "Aligner avec les enregistrements"
+    },
+    "placeholder": {
+      "selectColorField": "Sélectionner un champ de couleur"
+    },
+    "dialog": {
+      "startDate": "Date de début",
+      "endDate": "Date de fin",
+      "notAdd": "Non ajouter",
+      "addDateField": "Ajouter des champs de date",
+      "content": "Créer un calendrier de vue, et la table doit avoir deux champs de date : date de début et date de fin"
+    },
+    "moreLinkText": "Afficher toutes les {{count}} enregistrements"
+  },
   "menu": {
     "insertRecordAbove": "Insérer un enregistrement au-dessus",
     "insertRecordBelow": "Insérer un enregistrement en dessous",
@@ -440,7 +463,8 @@
       "table": "Vue en grille",
       "form": "Vue en formulaire",
       "kanban": "Vue Kanban",
-      "gallery": "Vue en galerie"
+      "gallery": "Vue en galerie",
+      "calendar": "Vue en calendrier"
     },
     "crash": {
       "title": "Plantage !",

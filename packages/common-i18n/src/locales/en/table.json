@@ -415,6 +415,29 @@
       "duplicateCard": "Duplicate card"
     }
   },
+  "calendar": {
+    "toolbar": {
+      "config": "Calendar Config",
+      "startDateField": "Start date field",
+      "endDateField": "End date field",
+      "titleField": "Title field",
+      "colorField": "Color field",
+      "colorType": "Color display",
+      "customColor": "Customize color",
+      "alignWithRecords": "Align with records"
+    },
+    "placeholder": {
+      "selectColorField": "Select a color field"
+    },
+    "dialog": {
+      "startDate": "Start date",
+      "endDate": "End date",
+      "notAdd": "Not add",
+      "addDateField": "Add date fields",
+      "content": "Create a calendar view schedule, and the table needs to have two date fields: start date and end date"
+    },
+    "moreLinkText": "Show all {{count}} records"
+  },
   "menu": {
     "insertRecordAbove": "Insert <input /> record above",
     "insertRecordBelow": "Insert <input /> record below",
@@ -452,7 +475,8 @@
       "table": "Grid View",
       "form": "Form View",
       "kanban": "Kanban View",
-      "gallery": "Gallery View"
+      "gallery": "Gallery View",
+      "calendar": "Calendar View"
     },
     "crash": {
       "title": "Crash!",

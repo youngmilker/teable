@@ -2,6 +2,7 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import type {
   IAggregationVo,
+  ICalendarDailyCollectionVo,
   IGroupPointsVo,
   IRowCountVo,
   ISearchCountVo,
@@ -9,6 +10,7 @@ import type {
 } from '@teable/openapi';
 import {
   aggregationRoSchema,
+  calendarDailyCollectionRoSchema,
   groupPointsRoSchema,
   IAggregationRo,
   IGroupPointsRo,
@@ -16,6 +18,7 @@ import {
   searchCountRoSchema,
   ISearchCountRo,
   queryBaseSchema,
+  ICalendarDailyCollectionRo,
   ISearchIndexByQueryRo,
   searchIndexByQueryRoSchema,
 } from '@teable/openapi';
@@ -71,5 +74,15 @@ export class AggregationOpenApiController {
     @Query(new ZodValidationPipe(groupPointsRoSchema), TqlPipe) query?: IGroupPointsRo
   ): Promise<IGroupPointsVo> {
     return await this.aggregationOpenApiService.getGroupPoints(tableId, query);
+  }
+
+  @Get('/calendar-daily-collection')
+  @Permissions('table|read')
+  async getCalendarDailyCollection(
+    @Param('tableId') tableId: string,
+    @Query(new ZodValidationPipe(calendarDailyCollectionRoSchema), TqlPipe)
+    query: ICalendarDailyCollectionRo
+  ): Promise<ICalendarDailyCollectionVo> {
+    return await this.aggregationOpenApiService.getCalendarDailyCollection(tableId, query);
   }
 }

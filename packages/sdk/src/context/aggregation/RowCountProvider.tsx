@@ -1,5 +1,6 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import type { ITableActionKey, IViewActionKey } from '@teable/core';
+import type { IQueryBaseRo } from '@teable/openapi';
 import { getRowCount, getShareViewRowCount } from '@teable/openapi';
 import { isEqual, omit } from 'lodash';
 import type { FC, ReactNode } from 'react';
@@ -19,6 +20,7 @@ import { RowCountContext } from './RowCountContext';
 
 interface RowCountProviderProps {
   children: ReactNode;
+  query?: IQueryBaseRo;
 }
 
 const hasChangesExceptWithKey = (
@@ -29,7 +31,7 @@ const hasChangesExceptWithKey = (
   return !isEqual(omit(prev, [key]), omit(next, [key]));
 };
 
-export const RowCountProvider: FC<RowCountProviderProps> = ({ children }) => {
+export const RowCountProvider: FC<RowCountProviderProps> = ({ children, query }) => {
   const isHydrated = useIsHydrated();
   const { tableId, viewId } = useContext(AnchorContext);
   const queryClient = useQueryClient();
@@ -46,8 +48,9 @@ export const RowCountProvider: FC<RowCountProviderProps> = ({ children }) => {
       selectedRecordIds,
       filterLinkCellCandidate,
       filter: shareId ? view?.filter : undefined,
+      ...query,
     }),
-    [viewId, searchQuery, selectedRecordIds, filterLinkCellCandidate, shareId, view?.filter]
+    [viewId, searchQuery, selectedRecordIds, filterLinkCellCandidate, shareId, view?.filter, query]
   );
 
   const prevQueryRef = useRef(rowCountQuery);
