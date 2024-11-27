@@ -10,7 +10,7 @@ import type { EventResizeDoneArg } from '@fullcalendar/interaction';
 import interactionPlugin from '@fullcalendar/interaction';
 import FullCalendar from '@fullcalendar/react';
 import { FieldKeyType } from '@teable/core';
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon } from '@teable/icons';
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Loader2 } from '@teable/icons';
 import { updateRecord } from '@teable/openapi';
 import { AppContext, CalendarDailyCollectionContext } from '@teable/sdk/context';
 import { useTableId } from '@teable/sdk/hooks';
@@ -25,6 +25,7 @@ import {
   PopoverContent,
   PopoverTrigger,
   Calendar as DatePicker,
+  cn,
 } from '@teable/ui-lib/shadcn';
 import { addDays, format } from 'date-fns';
 import { enUS, zhCN, ja, ru, fr } from 'date-fns/locale';
@@ -34,7 +35,7 @@ import { tableConfig } from '@/features/i18n/table.config';
 import { EventListContainer } from '../components/EventListContainer';
 import { EventMenu } from '../components/EventMenu';
 import { useCalendar, useEventMenuStore } from '../hooks';
-import { getColorByConfig } from '../util';
+import { getColorByConfig, getEventTitle } from '../util';
 
 const ADD_EVENT_BUTTON_CLASS_NAME = 'calendar-add-event-button';
 const MORE_LINK_TEXT_CLASS_NAME = 'calendar-custom-more-link-text';
@@ -203,6 +204,7 @@ export const Calendar = (props: ICalendarProps) => {
     });
   };
 
+  const isLoading = !calendarDailyCollection;
   const { countMap, records = [] } = calendarDailyCollection ?? {};
 
   const events = useMemo(() => {
@@ -222,8 +224,12 @@ export const Calendar = (props: ICalendarProps) => {
 
         return {
           id: r.id,
-          title: titleField.cellValue2String(title) || t('untitled'),
-          start: startDateField.cellValue2String(start),
+          title: getEventTitle(
+            titleField.cellValue2String(title) || t('sdk:common.unnamedRecord'),
+            start as string,
+            startDateField
+          ),
+          start,
           end: end ? addDays(new Date(end as string), 1).toISOString() : undefined,
           textColor,
           backgroundColor,
@@ -372,8 +378,14 @@ export const Calendar = (props: ICalendarProps) => {
     <div className="relative flex size-full flex-col overflow-hidden p-4 pt-2" ref={containerRef}>
       <div className="mb-2 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <h2 className="text-xl font-semibold">
+          <h2 className="flex items-center text-xl font-semibold">
             {title || calendarRef.current?.getApi().view.title}
+            <Loader2
+              className={cn(
+                'ml-1 size-5 animate-spin transition-opacity duration-1000',
+                isLoading ? 'opacity-100' : 'opacity-0'
+              )}
+            />
           </h2>
         </div>
         <div className="flex items-center gap-2">
