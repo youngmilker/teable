@@ -32,6 +32,7 @@ export const useKeyboardSelection = (props: ISelectionKeyboardProps) => {
     onDelete,
     onRowExpand,
     editorRef,
+    scrollBy,
   } = props;
   const { pureRowCount, columnCount } = coordInstance;
 
@@ -143,6 +144,17 @@ export const useKeyboardSelection = (props: ISelectionKeyboardProps) => {
     }
   );
 
+  useHotkeys(
+    ['PageUp', 'PageDown'],
+    () => {
+      const delta = coordInstance.containerHeight - coordInstance.rowInitSize - 1;
+      scrollBy(0, isHotkeyPressed('PageUp') ? -delta : delta);
+    },
+    {
+      enabled: Boolean(activeCell && !isEditing),
+      enableOnFormTags: ['input', 'select', 'textarea'],
+    }
+  );
   useHotkeys(
     'mod+a',
     () => {
