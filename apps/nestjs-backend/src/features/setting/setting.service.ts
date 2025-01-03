@@ -14,8 +14,13 @@ export class SettingService {
           disallowSignUp: true,
           disallowSpaceCreation: true,
           disallowSpaceInvitation: true,
+          aiConfig: true,
         },
       })
+      .then((setting) => ({
+        ...setting,
+        aiConfig: setting.aiConfig ? JSON.parse(setting.aiConfig as string) : null,
+      }))
       .catch(() => {
         throw new NotFoundException('Setting not found');
       });
@@ -25,7 +30,10 @@ export class SettingService {
     const setting = await this.getSetting();
     return await this.prismaService.setting.update({
       where: { instanceId: setting.instanceId },
-      data: updateSettingRo,
+      data: {
+        ...updateSettingRo,
+        aiConfig: updateSettingRo.aiConfig ? JSON.stringify(updateSettingRo.aiConfig) : null,
+      },
     });
   }
 }

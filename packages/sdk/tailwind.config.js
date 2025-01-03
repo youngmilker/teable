@@ -7,6 +7,15 @@ const buildFilePath = join(__dirname, './dist/**/*.{js,ts,jsx,tsx}');
 module.exports = uiConfig({
   content: [sdkPath, buildFilePath],
   darkMode: ['class'],
-  theme: {},
+  theme: {
+    extend: {
+      keyframes: {
+        scale: {
+          '0%, 100%': { transform: 'scale(1)' },
+          '50%': { transform: 'scale(0.8)' },
+        },
+      },
+    },
+  },
   plugins: [],
 });

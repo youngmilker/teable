@@ -4,6 +4,7 @@ import { getSetting, updateSetting } from '@teable/openapi';
 import { Label, Switch } from '@teable/ui-lib/shadcn';
 import { useTranslation } from 'next-i18next';
 import { CopyInstance } from './components';
+import { AIConfigForm } from './components/ai-config/ai-form';
 
 export interface ISettingPageProps {
   settingServerData?: ISettingVo;
@@ -26,7 +27,7 @@ export const SettingPage = (props: ISettingPageProps) => {
     },
   });
 
-  const onCheckedChange = (key: string, value: boolean) => {
+  const onValueChange = (key: string, value: unknown) => {
     mutateUpdateSetting({ [key]: value });
   };
 
@@ -41,46 +42,59 @@ export const SettingPage = (props: ISettingPageProps) => {
         <div className="mt-3 text-sm text-slate-500">{t('admin.setting.description')}</div>
       </div>
 
-      <div className="flex w-full flex-col space-y-4 py-4">
-        <div className="flex items-center justify-between space-x-2 rounded-lg border p-4 shadow-sm">
-          <div className="space-y-1">
-            <Label htmlFor="allow-sign-up">{t('admin.setting.allowSignUp')}</Label>
-            <div className="text-[13px] text-gray-500">
-              {t('admin.setting.allowSignUpDescription')}
+      {/* General Settings Section */}
+      <div className="border-b py-4">
+        <h2 className="mb-4 text-lg font-medium">{t('admin.setting.generalSettings')}</h2>
+        <div className="flex w-full flex-col space-y-4">
+          <div className="flex items-center justify-between space-x-2 rounded-lg border p-4 shadow-sm">
+            <div className="space-y-1">
+              <Label htmlFor="allow-sign-up">{t('admin.setting.allowSignUp')}</Label>
+              <div className="text-[13px] text-gray-500">
+                {t('admin.setting.allowSignUpDescription')}
+              </div>
             </div>
+            <Switch
+              id="allow-sign-up"
+              checked={!disallowSignUp}
+              onCheckedChange={(checked) => onValueChange('disallowSignUp', !checked)}
+            />
           </div>
-          <Switch
-            id="allow-sign-up"
-            checked={!disallowSignUp}
-            onCheckedChange={(checked) => onCheckedChange('disallowSignUp', !checked)}
-          />
-        </div>
-        <div className="flex items-center justify-between space-x-2 rounded-lg border p-4 shadow-sm">
-          <div className="space-y-1">
-            <Label htmlFor="allow-sign-up">{t('admin.setting.allowSpaceInvitation')}</Label>
-            <div className="text-[13px] text-gray-500">
-              {t('admin.setting.allowSpaceInvitationDescription')}
+          <div className="flex items-center justify-between space-x-2 rounded-lg border p-4 shadow-sm">
+            <div className="space-y-1">
+              <Label htmlFor="allow-sign-up">{t('admin.setting.allowSpaceInvitation')}</Label>
+              <div className="text-[13px] text-gray-500">
+                {t('admin.setting.allowSpaceInvitationDescription')}
+              </div>
             </div>
+            <Switch
+              id="allow-space-invitation"
+              checked={!disallowSpaceInvitation}
+              onCheckedChange={(checked) => onValueChange('disallowSpaceInvitation', !checked)}
+            />
           </div>
-          <Switch
-            id="allow-space-invitation"
-            checked={!disallowSpaceInvitation}
-            onCheckedChange={(checked) => onCheckedChange('disallowSpaceInvitation', !checked)}
-          />
-        </div>
-        <div className="flex items-center justify-between space-x-2 rounded-lg border p-4 shadow-sm">
-          <div className="space-y-1">
-            <Label htmlFor="allow-space-creation">{t('admin.setting.allowSpaceCreation')}</Label>
-            <div className="text-[13px] text-gray-500">
-              {t('admin.setting.allowSpaceCreationDescription')}
+          <div className="flex items-center justify-between space-x-2 rounded-lg border p-4 shadow-sm">
+            <div className="space-y-1">
+              <Label htmlFor="allow-space-creation">{t('admin.setting.allowSpaceCreation')}</Label>
+              <div className="text-[13px] text-gray-500">
+                {t('admin.setting.allowSpaceCreationDescription')}
+              </div>
             </div>
+            <Switch
+              id="allow-space-creation"
+              checked={!disallowSpaceCreation}
+              onCheckedChange={(checked) => onValueChange('disallowSpaceCreation', !checked)}
+            />
           </div>
-          <Switch
-            id="allow-space-creation"
-            checked={!disallowSpaceCreation}
-            onCheckedChange={(checked) => onCheckedChange('disallowSpaceCreation', !checked)}
-          />
         </div>
+      </div>
+
+      {/* AI Configuration Section */}
+      <div className="py-4">
+        <h2 className="mb-4 text-lg font-medium">{t('admin.setting.aiSettings')}</h2>
+        <AIConfigForm
+          aiConfig={setting.aiConfig}
+          setAiConfig={(value) => onValueChange('aiConfig', value)}
+        />
       </div>
 
       <div className="grow" />

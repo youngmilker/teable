@@ -7,6 +7,7 @@ import type { ICacheConfig } from './configs/cache.config';
 import { ConfigModule } from './configs/config.module';
 import { AccessTokenModule } from './features/access-token/access-token.module';
 import { AggregationOpenApiModule } from './features/aggregation/open-api/aggregation-open-api.module';
+import { AiModule } from './features/ai/ai.module';
 import { AttachmentsModule } from './features/attachments/attachments.module';
 import { AuthModule } from './features/auth/auth.module';
 import { BaseModule } from './features/base/base.module';
@@ -68,6 +69,7 @@ export const appModules = {
     DashboardModule,
     CommentOpenApiModule,
     OrganizationModule,
+    AiModule,
   ],
   providers: [InitBootstrapProvider],
 };

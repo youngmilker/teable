@@ -130,3 +130,11 @@ body {
 .fc-event:focus:after {
   @apply bg-transparent !important;
 }
+
+.cm-placeholder {
+  color: hsl(var(--muted));
+  display: inline-block;
+  pointer-events: none;
+  padding-left: 0.3rem;
+  font-size: small;
+}
