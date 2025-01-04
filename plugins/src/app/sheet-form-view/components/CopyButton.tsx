@@ -11,8 +11,15 @@ export const CopyButton = (props: ICopyButtonProps) => {
   const { text, iconClassName, ...rest } = props;
   const [isCopied, setIsCopied] = useState<boolean>(false);
 
-  const onCopy = async () => {
-    await navigator.clipboard.writeText(text);
+  const onCopy = () => {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.left = '-999999px';
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
     setIsCopied(true);
     setTimeout(() => {
       setIsCopied(false);

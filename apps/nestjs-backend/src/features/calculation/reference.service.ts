@@ -343,6 +343,7 @@ export class ReferenceService {
       if (!fromRecordIds?.length && !toRecordIds?.length) {
         continue;
       }
+
       const relatedRecordItems = await this.getAffectedRecordItems({
         fieldId,
         fieldMap,
@@ -583,6 +584,13 @@ export class ReferenceService {
       : (field.options as ILinkFieldOptions);
     const { relationship } = lookupOptions;
     const linkFieldId = field.lookupOptions ? field.lookupOptions.linkFieldId : field.id;
+
+    if (!recordItem.record?.fields) {
+      console.log('recordItem', JSON.stringify(recordItem, null, 2));
+      console.log('recordItem.field', field);
+      throw new InternalServerErrorException('record fields is undefined');
+    }
+
     const cellValue = recordItem.record.fields[linkFieldId];
     const dependenciesIndexed = keyBy(dependencies, 'id');
 
