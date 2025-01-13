@@ -22,6 +22,8 @@ import type { IFilterQueryInterface } from './filter-query/filter-query.interfac
 import { FilterQuerySqlite } from './filter-query/sqlite/filter-query.sqlite';
 import type { IGroupQueryExtra, IGroupQueryInterface } from './group-query/group-query.interface';
 import { GroupQuerySqlite } from './group-query/group-query.sqlite';
+import type { IntegrityQueryAbstract } from './integrity-query/abstract';
+import { IntegrityQuerySqlite } from './integrity-query/integrity-query.sqlite';
 import { SearchQueryAbstract } from './search-query/abstract';
 import { getOffset } from './search-query/get-offset';
 import { SearchQueryBuilder, SearchQuerySqlite } from './search-query/search-query.sqlite';
@@ -148,15 +150,19 @@ export class SqliteProvider implements IDbProvider {
       .update({
         [columnName]: this.knex.raw(
           `
-          (
-            SELECT json_group_array(
-              CASE
-                WHEN json_extract(value, '$.id') = ?
-                THEN json_patch(value, json_object(?, ?))
-                ELSE value
-              END
+          json(
+            (
+              SELECT json_group_array(
+                json(
+                  CASE
+                    WHEN json_extract(value, '$.id') = ?
+                    THEN json_patch(value, json_object(?, ?))
+                    ELSE value
+                  END
+                )
+              )
+              FROM json_each(${columnName})
             )
-            FROM json_each(${columnName})
           )
         `,
           [id, key, value]
@@ -330,6 +336,10 @@ export class SqliteProvider implements IDbProvider {
 
   baseQuery(): BaseQueryAbstract {
     return new BaseQuerySqlite(this.knex);
+  }
+
+  integrityQuery(): IntegrityQueryAbstract {
+    return new IntegrityQuerySqlite(this.knex);
   }
 
   calendarDailyCollectionQuery(
