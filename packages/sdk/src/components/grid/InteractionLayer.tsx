@@ -158,6 +158,7 @@ export const InteractionLayerBase: ForwardRefRenderFunction<
     onRowControlClick,
     onRowRangeSelected,
     onDragStart: _onDragStart,
+    externalHoverRowIndex,
   } = props;
 
   useImperativeHandle(ref, () => ({
@@ -844,6 +845,7 @@ export const InteractionLayerBase: ForwardRefRenderFunction<
           getLinearRow={getLinearRow}
           isFilling={isFillingRef.current}
           isFillEnabled={onFillSelection != null}
+          externalHoverRowIndex={externalHoverRowIndex}
         />
       </div>
 

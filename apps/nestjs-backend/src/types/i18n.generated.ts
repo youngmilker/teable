@@ -4328,6 +4328,7 @@ export type I18nTranslations = {
                 "kanban": string;
                 "gallery": string;
                 "calendar": string;
+                "gantt": string;
             };
             "crash": {
                 "title": string;
@@ -4924,6 +4925,28 @@ export type I18nTranslations = {
                 "selectField": string;
                 "groupByRow": string;
                 "groupByRowTip": string;
+            };
+        };
+        "gantt": {
+            "toolbar": {
+                "config": string;
+                "startDateField": string;
+                "endDateField": string;
+                "titleField": string;
+                "colorField": string;
+                "colorType": string;
+                "customColor": string;
+                "alignWithRecords": string;
+            };
+            "placeholder": {
+                "selectColorField": string;
+            };
+            "dialog": {
+                "startDate": string;
+                "endDate": string;
+                "notAdd": string;
+                "addDateField": string;
+                "content": string;
             };
         };
         "plugin": {

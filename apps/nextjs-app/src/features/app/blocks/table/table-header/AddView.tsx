@@ -22,6 +22,11 @@ export const AddView: React.FC = () => {
       Icon: VIEW_ICON_MAP[ViewType.Grid],
     },
     {
+      name: t('view.category.gantt'),
+      type: ViewType.Gantt,
+      Icon: VIEW_ICON_MAP[ViewType.Gantt],
+    },
+    {
       name: t('view.category.gallery'),
       type: ViewType.Gallery,
       Icon: VIEW_ICON_MAP[ViewType.Gallery],

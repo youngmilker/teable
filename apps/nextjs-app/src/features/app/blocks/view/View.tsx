@@ -15,6 +15,7 @@ import { CalendarView } from './calendar/CalendarView';
 import { FormView } from './form/FormView';
 import { GalleryView } from './gallery/GalleryView';
 import { GridView } from './grid/GridView';
+import { GridGanttView } from './gantt/GanttView';
 import { KanbanView } from './kanban/KanbanView';
 import { PluginView } from './plugin/PluginView';
 import type { IViewBaseProps } from './types';
@@ -60,6 +61,8 @@ export const View = (props: IViewBaseProps) => {
     switch (viewType) {
       case ViewType.Grid:
         return <GridView {...props} />;
+      case ViewType.Gantt:
+        return <GridGanttView {...props} />;
       case ViewType.Form:
         return <FormView />;
       case ViewType.Kanban:

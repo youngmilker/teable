@@ -17,6 +17,7 @@ import type {
   IFilterSet,
   IGalleryViewOptions,
   ICalendarViewOptions,
+  IGanttViewOptions,
   IColumn,
   IGridColumnMeta,
 } from '@teable/core';
@@ -147,7 +148,7 @@ export class ViewService implements IReadonlyAdapterService {
     const innerViewRo = { ...viewRo };
 
     // primary field set visible default
-    if ([ViewType.Kanban, ViewType.Gallery, ViewType.Calendar].includes(viewRo.type)) {
+    if ([ViewType.Kanban, ViewType.Gallery, ViewType.Calendar, ViewType.Gantt].includes(viewRo.type)) {
       const primaryField = await this.prismaService.txClient().field.findFirstOrThrow({
         where: { tableId, isPrimary: true, deletedTime: null },
         select: { id: true },
@@ -197,6 +198,33 @@ export class ViewService implements IReadonlyAdapterService {
 
         innerViewRo.options = {
           ...calendarOptions,
+          startDateFieldId,
+          endDateFieldId,
+        };
+      }
+
+      // set default start date and end date field ids for gantt view
+      if (innerViewRo.type === ViewType.Gantt) {
+        const fields = await this.prismaService.txClient().field.findMany({
+          where: { tableId, deletedTime: null },
+          select: { id: true, cellValueType: true, isMultipleCellValue: true },
+        });
+        const ganttOptions = (innerViewRo.options ?? {}) as IGanttViewOptions;
+
+        const dateFieldIds = fields
+          .filter(
+            ({ cellValueType, isMultipleCellValue }) =>
+              cellValueType === CellValueType.DateTime && !isMultipleCellValue
+          )
+          .map(({ id }) => id);
+
+        if (!dateFieldIds.length) return innerViewRo;
+
+        const startDateFieldId = ganttOptions.startDateFieldId ?? dateFieldIds[0];
+        const endDateFieldId = ganttOptions.endDateFieldId ?? dateFieldIds[1] ?? dateFieldIds[0];
+
+        innerViewRo.options = {
+          ...ganttOptions,
           startDateFieldId,
           endDateFieldId,
         };
@@ -477,7 +505,7 @@ export class ViewService implements IReadonlyAdapterService {
         );
         values.columnMeta = JSON.stringify(newColumnMeta);
 
-        if (type === ViewType.Grid) {
+        if (type === ViewType.Grid || type === ViewType.Gantt) {
           const originOptions = options ? JSON.parse(options) : {};
           const newOptions = adjustFrozenField(
             originOptions,

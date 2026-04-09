@@ -803,7 +803,8 @@
       "form": "Form view",
       "kanban": "Kanban view",
       "gallery": "Gallery view",
-      "calendar": "Calendar view"
+      "calendar": "Calendar view",
+      "gantt": "Gantt view"
     },
     "crash": {
       "title": "Crash!",
@@ -1410,5 +1411,27 @@
     "statusCompleted": "Completed",
     "statusCancel": "Cancel upload",
     "statusRetry": "Retry upload"
+  },
+  "gantt": {
+    "toolbar": {
+      "config": "Gantt config",
+      "startDateField": "Start date field",
+      "endDateField": "End date field",
+      "titleField": "Title field",
+      "colorField": "Color field",
+      "colorType": "Color display",
+      "customColor": "Customize color",
+      "alignWithRecords": "Align with records"
+    },
+    "placeholder": {
+      "selectColorField": "Select a color field"
+    },
+    "dialog": {
+      "startDate": "Start date",
+      "endDate": "End date",
+      "notAdd": "Not add",
+      "addDateField": "Add date fields",
+      "content": "Create a Gantt view, the table needs to have two date fields: start date and end date"
+    }
   }
 }

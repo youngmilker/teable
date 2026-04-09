@@ -660,7 +660,8 @@
       "form": "Vista de formulario",
       "kanban": "Vista kanban",
       "gallery": "Vista de la galería",
-      "calendar": "Vista de calendario"
+      "calendar": "Vista de calendario",
+      "gantt": "Vista Gantt"
     },
     "crash": {
       "title": "¡Chocar!",
@@ -1256,6 +1257,28 @@
       "selectField": "Por defecto: índice de adjunto",
       "groupByRow": "Archivar en carpetas",
       "groupByRowTip": "Cuando una fila tiene múltiples adjuntos, se colocarán en la misma carpeta; las filas con solo un adjunto no crearán una carpeta."
+    }
+  },
+  "gantt": {
+    "toolbar": {
+      "config": "Configuración de Gantt",
+      "startDateField": "Campo de fecha de inicio",
+      "endDateField": "Campo de fecha de fin",
+      "titleField": "Campo de título",
+      "colorField": "Campo de color",
+      "colorType": "Visualización de color",
+      "customColor": "Personalizar el color",
+      "alignWithRecords": "Alinearse con los registros"
+    },
+    "placeholder": {
+      "selectColorField": "Seleccione un campo de color"
+    },
+    "dialog": {
+      "startDate": "Fecha de inicio",
+      "endDate": "Fecha final",
+      "notAdd": "No agregar",
+      "addDateField": "Agregar campos de fecha",
+      "content": "Cree una vista de Gantt, y la tabla debe tener dos campos de fecha: fecha de inicio y fecha de finalización"
     }
   }
 }

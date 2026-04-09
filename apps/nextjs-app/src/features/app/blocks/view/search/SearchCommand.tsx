@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { FieldType, ViewType } from '@teable/core';
+import { SEARCH_CURSOR_VIEW_TYPES } from './const';
 import { HelpCircle } from '@teable/icons';
 import {
   toggleTableIndex,
@@ -282,7 +283,7 @@ export const SearchCommand = forwardRef<ISearchCommandRef, ISearchCommand>((prop
           </Toggle>
         </div>
 
-        {view?.type === ViewType.Grid && (
+        {view?.type && SEARCH_CURSOR_VIEW_TYPES.includes(view.type) && (
           <div className="flex items-center justify-around gap-1">
             <Toggle
               pressed={!hideNotMatchRow}

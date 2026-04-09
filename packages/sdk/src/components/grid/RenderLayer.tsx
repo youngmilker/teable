@@ -61,6 +61,7 @@ export interface IRenderLayerProps
   isColumnResizable?: boolean;
   isColumnAppendEnable?: boolean;
   isColumnHeaderMenuVisible?: boolean;
+  externalHoverRowIndex?: number | null;
   real2RowIndex: (index: number) => number;
   getLinearRow: (index: number) => ILinearRow;
 }
@@ -109,6 +110,7 @@ export const RenderLayer: FC<React.PropsWithChildren<IRenderLayerProps>> = (prop
     getLinearRow,
     isFilling,
     isFillEnabled,
+    externalHoverRowIndex,
   } = props;
   const { containerWidth } = coordInstance;
   const { x, y, columnIndex, rowIndex, type, isOutOfBounds } = originMouseState;
@@ -187,6 +189,7 @@ export const RenderLayer: FC<React.PropsWithChildren<IRenderLayerProps>> = (prop
       getCellContent,
       real2RowIndex,
       getLinearRow,
+      externalHoverRowIndex,
     };
     lastPropsRef.current = props;
     drawGrid(mainCanvas, cacheCanvas, props, lastProps);
@@ -235,6 +238,7 @@ export const RenderLayer: FC<React.PropsWithChildren<IRenderLayerProps>> = (prop
     getCellContent,
     real2RowIndex,
     getLinearRow,
+    externalHoverRowIndex,
   ]);
 
   return (

@@ -1,3 +1,4 @@
+import type { IGroupPointsVo } from '@teable/openapi';
 import type { IGridRef, IRecordIndexMap, IFieldInstance } from '@teable/sdk';
 import { noop } from 'lodash';
 import { create } from 'zustand';
@@ -43,6 +44,17 @@ interface IGridRefState {
   setHighlightedTableId: (tableId: string | null) => void;
   highlightedViewId: string | null;
   setHighlightedViewId: (viewId: string | null) => void;
+  // Gantt 兼容配置
+  groupPoints: IGroupPointsVo | null;
+  setGroupPoints: (groupPoints: IGroupPointsVo | null) => void;
+  hasAppendRow: boolean;
+  setHasAppendRow: (hasAppendRow: boolean) => void;
+  // 左右联动行悬浮高亮
+  hoveredRowIndex: number | null;
+  setHoveredRowIndex: (rowIndex: number | null) => void;
+  // 左右联动行选中高亮
+  selectedRowIndex: number | null;
+  setSelectedRowIndex: (rowIndex: number | null) => void;
 }
 
 export const useGridSearchStore = create<IGridRefState>((set) => ({
@@ -52,6 +64,10 @@ export const useGridSearchStore = create<IGridRefState>((set) => ({
   fields: null,
   highlightedTableId: null,
   highlightedViewId: null,
+  groupPoints: null,
+  hasAppendRow: false,
+  hoveredRowIndex: null,
+  selectedRowIndex: null,
   resetSearchHandler: noop,
   setResetSearchHandler: (fn: () => void) => {
     set((state) => {
@@ -112,5 +128,19 @@ export const useGridSearchStore = create<IGridRefState>((set) => ({
         highlightedViewId: viewId,
       };
     });
+  },
+  // gantt 兼容配置
+  // 新增 groupPoints 和 hasAppendRow 的状态管理
+  setGroupPoints: (groupPoints: IGroupPointsVo | null) => {
+    set((state) => ({ ...state, groupPoints }));
+  },
+  setHasAppendRow: (hasAppendRow: boolean) => {
+    set((state) => ({ ...state, hasAppendRow }));
+  },
+  setHoveredRowIndex: (rowIndex: number | null) => {
+    set((state) => ({ ...state, hoveredRowIndex: rowIndex }));
+  },
+  setSelectedRowIndex: (rowIndex: number | null) => {
+    set((state) => ({ ...state, selectedRowIndex: rowIndex }));
   },
 }));

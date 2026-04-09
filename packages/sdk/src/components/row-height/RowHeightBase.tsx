@@ -16,16 +16,20 @@ import { useRowHeightNodes } from './useRowHeightNodes';
 interface IRowHeightBaseProps {
   rowHeight?: RowHeightLevel;
   fieldNameDisplayLines?: number;
+  fieldNameDisplayLinesRange?: { min: number; max: number };
   onChange?: (type: 'rowHeight' | 'fieldNameDisplayLines', value: RowHeightLevel | number) => void;
   children: React.ReactNode;
 }
 
 export const RowHeightBase = (props: IRowHeightBaseProps) => {
-  const { rowHeight, fieldNameDisplayLines, children, onChange } = props;
+  const { rowHeight, fieldNameDisplayLines, fieldNameDisplayLinesRange, children, onChange } = props;
 
   const { t } = useTranslation();
   const rowHeightMenuItems = useRowHeightNodes();
-  const fieldNameDisplayLinesMenuItems = useFieldNameDisplayLinesNodes();
+  const fieldNameDisplayLinesMenuItems = useFieldNameDisplayLinesNodes(
+    fieldNameDisplayLinesRange?.min,
+    fieldNameDisplayLinesRange?.max
+  );
 
   return (
     <DropdownMenu>

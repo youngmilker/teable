@@ -34,6 +34,7 @@ import type {
   IFilterItem,
   IFieldReferenceValue,
   IGridViewOptions,
+  IGanttViewOptions,
   ISort,
   IGroup,
   ICalendarViewOptions,
@@ -288,6 +289,17 @@ export class FieldOpenApiService {
       case ViewType.Grid: {
         const options = this.parseJsonOptions<IGridViewOptions>(rawOptions);
         addFieldId(options?.frozenFieldId);
+        break;
+      }
+      case ViewType.Gantt: {
+        const options = this.parseJsonOptions<IGanttViewOptions>(rawOptions);
+        addFieldId(options?.frozenFieldId);
+        addFieldId(options?.startDateFieldId);
+        addFieldId(options?.endDateFieldId);
+        addFieldId(options?.titleFieldId);
+        if (options?.colorConfig?.type === ColorConfigType.Field) {
+          addFieldId(options.colorConfig.fieldId);
+        }
         break;
       }
       case ViewType.Kanban: {

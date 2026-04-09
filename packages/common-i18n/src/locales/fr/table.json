@@ -655,7 +655,8 @@
       "form": "Vue en formulaire",
       "kanban": "Vue Kanban",
       "gallery": "Vue en galerie",
-      "calendar": "Vue en calendrier"
+      "calendar": "Vue en calendrier",
+      "gantt": "Vue Gantt"
     },
     "crash": {
       "title": "Plantage !",
@@ -1242,6 +1243,28 @@
       "selectField": "Par défaut: index de pièce jointe",
       "groupByRow": "Archiver dans des dossiers",
       "groupByRowTip": "Lorsqu'une ligne contient plusieurs pièces jointes, elles seront placées dans le même dossier ; les lignes avec une seule pièce jointe ne créeront pas de dossier."
+    }
+  },
+  "gantt": {
+    "toolbar": {
+      "config": "Configuration Gantt",
+      "startDateField": "Champ de date de début",
+      "endDateField": "Champ de date de fin",
+      "titleField": "Champ de titre",
+      "colorField": "Champ de couleur",
+      "colorType": "Affichage de la couleur",
+      "customColor": "Personnaliser la couleur",
+      "alignWithRecords": "Aligner avec les enregistrements"
+    },
+    "placeholder": {
+      "selectColorField": "Sélectionner un champ de couleur"
+    },
+    "dialog": {
+      "startDate": "Date de début",
+      "endDate": "Date de fin",
+      "notAdd": "Non ajouter",
+      "addDateField": "Ajouter des champs de date",
+      "content": "Créer une vue Gantt, et la table doit avoir deux champs de date : date de début et date de fin"
     }
   }
 }

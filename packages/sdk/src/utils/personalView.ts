@@ -4,6 +4,7 @@ import type {
   IViewVo,
   IKanbanViewOptions,
   ICalendarViewOptions,
+  IGanttViewOptions,
   IColumnMeta,
   IFilter,
   IFilterItem,
@@ -150,6 +151,28 @@ export const validateViewOptions = (view: IViewVo, fieldMap: Record<string, IFie
     case ViewType.Calendar: {
       const { startDateFieldId, endDateFieldId, titleFieldId, colorConfig } =
         options as ICalendarViewOptions;
+      const isColorByField = colorConfig?.type === ColorConfigType.Field;
+      const colorFieldId = isColorByField ? colorConfig?.fieldId : null;
+      const colorField = colorFieldId ? fieldMap[colorFieldId] : null;
+
+      return {
+        ...options,
+        startDateFieldId: validateField(startDateFieldId, fieldMap, FieldType.Date),
+        endDateFieldId: validateField(endDateFieldId, fieldMap, FieldType.Date),
+        titleFieldId: validateField(titleFieldId, fieldMap),
+        colorConfig: isColorByField
+          ? colorFieldId && colorField && colorField.type === FieldType.SingleSelect
+            ? {
+                ...colorConfig,
+                fieldId: colorFieldId,
+              }
+            : undefined
+          : colorConfig,
+      };
+    }
+    case ViewType.Gantt: {
+      const { startDateFieldId, endDateFieldId, titleFieldId, colorConfig } =
+        options as IGanttViewOptions;
       const isColorByField = colorConfig?.type === ColorConfigType.Field;
       const colorFieldId = isColorByField ? colorConfig?.fieldId : null;
       const colorField = colorFieldId ? fieldMap[colorFieldId] : null;

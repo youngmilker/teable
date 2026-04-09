@@ -802,6 +802,7 @@
     },
     "category": {
       "table": "表格视图",
+      "gantt": "甘特视图",
       "form": "表单视图",
       "kanban": "看板视图",
       "gallery": "画册视图",
@@ -1411,5 +1412,27 @@
     "statusCompleted": "完成",
     "statusCancel": "取消上传",
     "statusRetry": "重试上传"
+  },
+  "gantt": {
+    "toolbar": {
+      "config": "甘特视图配置",
+      "startDateField": "开始日期字段",
+      "endDateField": "结束日期字段",
+      "titleField": "标题字段",
+      "colorField": "颜色字段",
+      "colorType": "颜色显示",
+      "customColor": "自定义颜色",
+      "alignWithRecords": "跟随字段颜色"
+    },
+    "placeholder": {
+      "selectColorField": "选择一个颜色字段"
+    },
+    "dialog": {
+      "startDate": "开始日期",
+      "endDate": "结束日期",
+      "notAdd": "暂不添加",
+      "addDateField": "添加日期字段",
+      "content": "新建甘特视图，表格中需要存在开始和结束两个日期字段"
+    }
   }
 }

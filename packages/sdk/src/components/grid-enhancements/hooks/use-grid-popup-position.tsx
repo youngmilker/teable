@@ -3,9 +3,10 @@ import type { IEditorProps } from '../../grid/components';
 import { GRID_CONTAINER_ATTR } from '../../grid/configs';
 
 const SAFE_SPACING = 32;
+const POPUP_MIN_WIDTH = 250;
 
 export const useGridPopupPosition = (rect: IEditorProps['rect'], maxHeight?: number) => {
-  const { y, height, editorId } = rect;
+  const { x, y, width, height, editorId } = rect;
 
   return useMemo(() => {
     const editorElement = document.querySelector('#' + editorId);
@@ -24,10 +25,18 @@ export const useGridPopupPosition = (rect: IEditorProps['rect'], maxHeight?: num
       maxHeight ?? Infinity
     );
 
+    // Horizontal: if the popup would overflow the grid container's right edge,
+    // shift it leftward so it stays visible.
+    const popupWidth = Math.max(width, POPUP_MIN_WIDTH);
+    const gridWidth = gridBound.width;
+    const rightOverflow = x + popupWidth - gridWidth;
+    const left = rightOverflow > 0 ? Math.max(-x, -rightOverflow) : undefined;
+
     return {
       top: isAbove ? 'unset' : height + 1,
       bottom: isAbove ? height : 'unset',
       maxHeight: finalHeight,
+      ...(left != null ? { left } : {}),
     };
-  }, [editorId, y, height, maxHeight]);
+  }, [editorId, x, y, width, height, maxHeight]);
 };

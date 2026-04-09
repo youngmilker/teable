@@ -654,7 +654,8 @@
       "form": "フォームビュー",
       "kanban": "カンバンビュー",
       "gallery": "ギャラリービュー",
-      "calendar": "カレンダービュー"
+      "calendar": "カレンダービュー",
+      "gantt": "ガントビュー"
     },
     "crash": {
       "title": "クラッシュしました！",
@@ -1241,6 +1242,28 @@
       "selectField": "デフォルト: 添付ファイル番号",
       "groupByRow": "フォルダにアーカイブ",
       "groupByRowTip": "行に複数の添付ファイルがある場合、同じフォルダに配置されます。添付ファイルが1つだけの行はフォルダを作成しません。"
+    }
+  },
+  "gantt": {
+    "toolbar": {
+      "config": "ガント設定",
+      "startDateField": "開始日付フィールド",
+      "endDateField": "終了日付フィールド",
+      "titleField": "タイトルフィールド",
+      "colorField": "色フィールド",
+      "colorType": "色表示",
+      "customColor": "カスタマイズ",
+      "alignWithRecords": "レコードに合わせる"
+    },
+    "placeholder": {
+      "selectColorField": "色フィールドを選択"
+    },
+    "dialog": {
+      "startDate": "開始日付",
+      "endDate": "終了日付",
+      "notAdd": "追加しない",
+      "addDateField": "日付フィールドを追加",
+      "content": "ガントビューを作成し、テーブルには開始日付と終了日付の2つの日付フィールドが必要です"
     }
   }
 }

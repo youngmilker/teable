@@ -667,7 +667,8 @@
       "form": "Vista Modulo",
       "kanban": "Vista Kanban",
       "gallery": "Vista Galleria",
-      "calendar": "Vista Calendario"
+      "calendar": "Vista Calendario",
+      "gantt": "Vista Gantt"
     },
     "crash": {
       "title": "Errore!",
@@ -1267,6 +1268,28 @@
       "selectField": "Predefinito: indice allegato",
       "groupByRow": "Archivia in cartelle",
       "groupByRowTip": "Quando una riga ha più allegati, verranno inseriti nella stessa cartella; le righe con un solo allegato non creeranno una cartella."
+    }
+  },
+  "gantt": {
+    "toolbar": {
+      "config": "Configurazione Gantt",
+      "startDateField": "Campo data di inizio",
+      "endDateField": "Campo data di fine",
+      "titleField": "Campo titolo",
+      "colorField": "Campo colore",
+      "colorType": "Visualizzazione colore",
+      "customColor": "Personalizza colore",
+      "alignWithRecords": "Allinea con i record"
+    },
+    "placeholder": {
+      "selectColorField": "Seleziona un campo colore"
+    },
+    "dialog": {
+      "startDate": "Data di inizio",
+      "endDate": "Data di fine",
+      "notAdd": "Non aggiungere",
+      "addDateField": "Aggiungi campi data",
+      "content": "Crea una vista Gantt, e la tabella deve avere due campi data: data di inizio e data di fine"
     }
   }
 }

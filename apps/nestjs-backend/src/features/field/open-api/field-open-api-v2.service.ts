@@ -125,7 +125,7 @@ export class FieldOpenApiV2Service {
   }
 
   private toGridViewDeleteSnapshot(view: IViewVo): GridViewDeleteSnapshot[] {
-    if (view.type !== ViewType.Grid) {
+    if (view.type !== ViewType.Grid && view.type !== ViewType.Gantt) {
       return [];
     }
 

@@ -125,6 +125,7 @@ import { getSyncCopyData } from './utils/getSyncCopyData';
 interface IGridViewBaseInnerProps {
   groupPointsServerData?: IGroupPointsVo | null;
   onRowExpand?: (recordId: string) => void;
+  disableColumnAppend?: boolean;
 }
 
 const { scrollBuffer, columnAppendBtnWidth } = GRID_DEFAULT;
@@ -132,7 +133,7 @@ const { scrollBuffer, columnAppendBtnWidth } = GRID_DEFAULT;
 export const GridViewBaseInner: React.FC<IGridViewBaseInnerProps> = (
   props: IGridViewBaseInnerProps
 ) => {
-  const { groupPointsServerData, onRowExpand } = props;
+  const { groupPointsServerData, onRowExpand, disableColumnAppend } = props;
   const { t, i18n } = useTranslation(tableConfig.i18nNamespaces);
   const { updateRecord, duplicateRecord } = useRecordOperations();
   const router = useRouter();
@@ -192,7 +193,7 @@ export const GridViewBaseInner: React.FC<IGridViewBaseInnerProps> = (
   const realRowCount = rowCount ?? ssrRecords?.length ?? 0;
   const fieldEditable = permission['field|update'];
   const { undo, redo } = useUndoRedo();
-  const { setGridRef, searchCursor, setRecordMap, setFields } = useGridSearchStore();
+  const { setGridRef, searchCursor, setRecordMap, setFields, setGroupPoints, setHasAppendRow, setHoveredRowIndex, setSelectedRowIndex, hoveredRowIndex } = useGridSearchStore();
   const [expandRecord, setExpandRecord] = useState<{ tableId: string; recordId: string }>();
   const [newRecords, setNewRecords] = useState<ICreateRecordsRo['records']>();
   const [cellErrors, setCellErrors] = useState<ICellError[]>([]);
@@ -215,6 +216,11 @@ export const GridViewBaseInner: React.FC<IGridViewBaseInnerProps> = (
   const containerRef = useRef<HTMLDivElement>(null);
   const expandRecordRef = useRef<IExpandRecordContainerRef>(null);
   const confirmNewRecordsRef = useRef<IConfirmNewRecordsRef>(null);
+
+  // Share gridRef with store so the gantt overlay can access row offsets
+  useEffect(() => {
+    setGridRef(gridRef);
+  }, [setGridRef]);
 
   const groupCollection = useGridGroupCollection();
 
@@ -257,6 +263,11 @@ export const GridViewBaseInner: React.FC<IGridViewBaseInnerProps> = (
     getPresortCellContent,
     setPresortRecordData,
   } = useGridSelection({ recordMap, columns, viewQuery, gridRef });
+
+  // Sync grid selected row to store for gantt highlight
+  useEffect(() => {
+    setSelectedRowIndex(activeCell?.rowIndex ?? null);
+  }, [activeCell?.rowIndex, setSelectedRowIndex]);
 
   const {
     localRecord,
@@ -411,6 +422,15 @@ export const GridViewBaseInner: React.FC<IGridViewBaseInnerProps> = (
   useEffect(() => {
     setFields(fields);
   }, [fields, setFields]);
+  // gantt图如果后端没有返回group points数据，
+  // 就用前端的逻辑生成group points，保证甘特图能正常显示
+  useEffect(() => {
+    setGroupPoints(groupPoints ?? null);
+  }, [groupPoints, setGroupPoints]);
+
+  useEffect(() => {
+    setHasAppendRow(!isTouchDevice && Boolean(permission['record|create']));
+  }, [isTouchDevice, permission, setHasAppendRow]);
 
   useEffect(() => {
     if (preTableId && preTableId !== tableId) {
@@ -1066,8 +1086,23 @@ export const GridViewBaseInner: React.FC<IGridViewBaseInnerProps> = (
   };
 
   const onItemHovered = (type: RegionType, bounds: IRectangle, cellItem: ICellItem) => {
-    const [columnIndex] = cellItem;
+    const [columnIndex, realRowIndex] = cellItem;
     const { description } = columns[columnIndex] ?? {};
+
+    // Sync hovered row to shared store for gantt highlight — only for actual data rows
+    const isDataRow =
+      type === RegionType.Cell ||
+      type === RegionType.ActiveCell ||
+      type === RegionType.CellValue ||
+      type === RegionType.RowHeader ||
+      type === RegionType.RowHeaderCheckbox ||
+      type === RegionType.RowHeaderDragHandler ||
+      type === RegionType.RowHeaderExpandHandler;
+    if (isDataRow && Number.isFinite(realRowIndex) && realRowIndex >= 0) {
+      setHoveredRowIndex(realRowIndex);
+    } else {
+      setHoveredRowIndex(null);
+    }
 
     closeTooltip();
 
@@ -1411,6 +1446,7 @@ export const GridViewBaseInner: React.FC<IGridViewBaseInnerProps> = (
         ref={gridRef}
         theme={theme}
         style={{ pointerEvents: inPrefilling || inPresorting ? 'none' : 'auto' }}
+        scrollBufferX={disableColumnAppend ? 0 : undefined}
         draggable={draggable}
         isTouchDevice={isTouchDevice}
         rowCount={realRowCount}
@@ -1439,7 +1475,7 @@ export const GridViewBaseInner: React.FC<IGridViewBaseInnerProps> = (
         onCellEdited={getAuthorizedFunction(onCellEdited, 'record|update')}
         onFillSelection={getAuthorizedFunction(onFillSelection, 'record|update')}
         onCellDblClick={onCellDblClick}
-        onColumnAppend={getAuthorizedFunction(onColumnAppend, 'field|create')}
+        onColumnAppend={disableColumnAppend ? undefined : getAuthorizedFunction(onColumnAppend, 'field|create')}
         onColumnFreeze={getAuthorizedFunction(onColumnFreeze, 'view|update')}
         onColumnResize={getAuthorizedFunction(onColumnResize, 'view|update')}
         onColumnOrdered={getAuthorizedFunction(onColumnOrdered, 'view|update')}
@@ -1459,6 +1495,7 @@ export const GridViewBaseInner: React.FC<IGridViewBaseInnerProps> = (
         onPaste={onPaste}
         onItemClick={onItemClick}
         onItemHovered={onItemHovered}
+        externalHoverRowIndex={hoveredRowIndex}
       />
       {fieldAIEnable && (
         <AiGenerateButton
@@ -1502,7 +1539,7 @@ export const GridViewBaseInner: React.FC<IGridViewBaseInnerProps> = (
               ref={prefillingGridRef}
               theme={theme}
               scrollBufferX={
-                permission['field|create'] ? scrollBuffer + columnAppendBtnWidth : scrollBuffer
+                !disableColumnAppend && permission['field|create'] ? scrollBuffer + columnAppendBtnWidth : scrollBuffer
               }
               scrollBufferY={0}
               scrollBarVisible={false}
@@ -1537,7 +1574,7 @@ export const GridViewBaseInner: React.FC<IGridViewBaseInnerProps> = (
             ref={presortGridRef}
             theme={theme}
             scrollBufferX={
-              permission['field|create'] ? scrollBuffer + columnAppendBtnWidth : scrollBuffer
+              !disableColumnAppend && permission['field|create'] ? scrollBuffer + columnAppendBtnWidth : scrollBuffer
             }
             scrollBufferY={0}
             scrollBarVisible={false}

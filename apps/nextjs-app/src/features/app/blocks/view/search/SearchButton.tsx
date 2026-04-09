@@ -1,5 +1,4 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { ViewType } from '@teable/core';
 import { AlertCircle, Search, X } from '@teable/icons';
 import {
   getTableActivatedIndex,
@@ -51,6 +50,8 @@ export interface ISearchButtonProps {
   textClassName?: string;
   shareView?: boolean;
 }
+
+import { SEARCH_CURSOR_VIEW_TYPES } from './const';
 
 export const SearchButton = (props: ISearchButtonProps) => {
   const { className, textClassName, shareView = false } = props;
@@ -161,7 +162,7 @@ export const SearchButton = (props: ISearchButtonProps) => {
 
     const localSearchKey = `${tableId}-${viewId}`;
 
-    if (view?.type === ViewType.Grid) {
+    if (view?.type && SEARCH_CURSOR_VIEW_TYPES.includes(view.type)) {
       setHideNotMatchRow(lsHideNotMatch);
     } else {
       // other view type only support filter search, causing the search hit highlight
@@ -409,7 +410,7 @@ export const SearchButton = (props: ISearchButtonProps) => {
           }}
         />
         <div className="flex shrink-0 items-center">
-          {view?.type === ViewType.Grid && (
+          {view?.type && SEARCH_CURSOR_VIEW_TYPES.includes(view.type) && (
             <SearchCountPagination shareView={shareView} ref={searchPaginationRef} />
           )}
 

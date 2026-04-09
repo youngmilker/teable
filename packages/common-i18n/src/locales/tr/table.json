@@ -644,7 +644,8 @@
       "form": "Form Görünümü",
       "kanban": "Kanban Görünümü",
       "gallery": "Galeri Görünümü",
-      "calendar": "Takvim Görünümü"
+      "calendar": "Takvim Görünümü",
+      "gantt": "Gantt Görünümü"
     },
     "crash": {
       "title": "Çöktü!",
@@ -750,5 +751,27 @@
     "publishFailed": "Uygulama yayınlanamadı",
     "openLink": "Bağlantıyı aç",
     "appPublished": "Uygulama yayınlandı"
+  },
+  "gantt": {
+    "toolbar": {
+      "config": "Gantt Yapılandırması",
+      "startDateField": "Başlangıç tarihi alanı",
+      "endDateField": "Bitiş tarihi alanı",
+      "titleField": "Başlık alanı",
+      "colorField": "Renk alanı",
+      "colorType": "Renk görüntüleme",
+      "customColor": "Rengi özelleştir",
+      "alignWithRecords": "Kayıtlarla hizala"
+    },
+    "placeholder": {
+      "selectColorField": "Bir renk alanı seçin"
+    },
+    "dialog": {
+      "startDate": "Başlangıç tarihi",
+      "endDate": "Bitiş tarihi",
+      "notAdd": "Ekleme",
+      "addDateField": "Tarih alanları ekle",
+      "content": "Gantt görünümü oluşturmak için tablonun iki tarih alanına ihtiyacı var: başlangıç tarihi ve bitiş tarihi"
+    }
   }
 }

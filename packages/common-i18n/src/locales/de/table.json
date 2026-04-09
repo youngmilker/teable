@@ -667,7 +667,8 @@
       "form": "Formular Ansicht",
       "kanban": "Kanban Ansicht",
       "gallery": "Galerie Ansicht",
-      "calendar": "Kalendar Ansicht"
+      "calendar": "Kalendar Ansicht",
+      "gantt": "Gantt Ansicht"
     },
     "crash": {
       "title": "Crash!",
@@ -1263,6 +1264,28 @@
       "selectField": "Standard: Anhangsindex",
       "groupByRow": "In Ordner archivieren",
       "groupByRowTip": "Wenn eine Zeile mehrere Anhänge hat, werden sie im selben Ordner abgelegt; Zeilen mit nur einem Anhang erstellen keinen Ordner."
+    }
+  },
+  "gantt": {
+    "toolbar": {
+      "config": "Gantt Konfiguration",
+      "startDateField": "Anfangsdatum Feld",
+      "endDateField": "Enddatum Feld",
+      "titleField": "Titel Feld",
+      "colorField": "Farbe Feld",
+      "colorType": "Farbanzeige",
+      "customColor": "Farbe anpassen",
+      "alignWithRecords": "An Datensätzen ausrichten"
+    },
+    "placeholder": {
+      "selectColorField": "Ein Farbfeld auswählen"
+    },
+    "dialog": {
+      "startDate": "Startdatum",
+      "endDate": "Enddatum",
+      "notAdd": "Nicht hinzufügen",
+      "addDateField": "Datumsfelder hinzufügen",
+      "content": "Erstellen Sie eine Gantt-Ansicht. Die Tabelle muss zwei Datumsfelder enthalten: Startdatum und Enddatum"
     }
   }
 }

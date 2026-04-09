@@ -1,6 +1,7 @@
 import { ViewType } from '@teable/core';
 import {
   Sheet,
+  GanttChart,
   ClipboardList as Form,
   LayoutGrid as Gallery,
   Kanban,
@@ -10,6 +11,7 @@ import {
 
 export const VIEW_ICON_MAP = {
   [ViewType.Grid]: Sheet,
+  [ViewType.Gantt]: GanttChart,
   [ViewType.Kanban]: Kanban,
   [ViewType.Gallery]: Gallery,
   [ViewType.Calendar]: Calendar,

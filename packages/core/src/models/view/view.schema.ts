@@ -8,6 +8,7 @@ import { galleryViewOptionSchema } from './derivate/gallery-view-option.schema';
 import { gridViewOptionSchema } from './derivate/grid-view-option.schema';
 import { kanbanViewOptionSchema } from './derivate/kanban-view-option.schema';
 import { pluginViewOptionSchema } from './derivate/plugin-view-option.schema';
+import { ganttViewOptionSchema } from './derivate/gantt-view-option.schema';
 import { filterSchema } from './filter';
 import { groupSchema } from './group';
 import { viewOptionsSchema } from './option.schema';
@@ -79,6 +80,7 @@ export const viewRoSchema = viewVoSchema
       [ViewType.Gallery]: galleryViewOptionSchema,
       [ViewType.Calendar]: calendarViewOptionSchema,
       [ViewType.Grid]: gridViewOptionSchema,
+      [ViewType.Gantt]: ganttViewOptionSchema,
       [ViewType.Plugin]: pluginViewOptionSchema,
     } as const;
     if (!(type in optionsSchemaMap)) {

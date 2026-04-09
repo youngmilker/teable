@@ -16,6 +16,8 @@ export type IColumnMeta = z.infer<typeof columnMetaSchema>;
 
 export type IGridColumnMeta = z.infer<typeof gridColumnMetaSchema>;
 
+export type IGanttColumnMeta = z.infer<typeof ganttColumnMetaSchema>;
+
 export type IKanbanColumnMeta = z.infer<typeof kanbanColumnMetaSchema>;
 
 export type IGalleryColumnMeta = z.infer<typeof galleryColumnMetaSchema>;
@@ -29,6 +31,8 @@ export type IPluginColumnMeta = z.infer<typeof pluginColumnMetaSchema>;
 export type IColumn = z.infer<typeof columnSchema>;
 
 export type IGridColumn = z.infer<typeof gridColumnSchema>;
+
+export type IGanttColumn = z.infer<typeof ganttColumnSchema>;
 
 export type IKanbanColumn = z.infer<typeof kanbanColumnSchema>;
 
@@ -57,6 +61,24 @@ export const gridColumnSchema = columnSchemaBase.extend({
     description: 'Statistic function of the column in the view.',
   }),
 });
+
+// 复用 gridColumnSchema的内容，新增 gantt 专属的 schema 和 type
+// 新增 showInBar 字段，表示该列是否显示在甘特条上（备用）
+export const ganttColumnSchema = columnSchemaBase.extend({
+  width: z.number().optional().meta({
+    description: 'Column width in the view.',
+  }),
+  hidden: z.boolean().optional().meta({
+    description: 'If column hidden in the view.',
+  }),
+  statisticFunc: z.enum(StatisticsFunc).nullable().optional().meta({
+    description: 'Statistic function of the column in the view.',
+  }),
+  showInBar: z.boolean().optional().meta({
+    description: 'If the column is shown in the Gantt bar.',
+  }),
+}
+);
 
 export const kanbanColumnSchema = columnSchemaBase.extend({
   visible: z.boolean().optional().meta({
@@ -97,6 +119,7 @@ export const columnSchema = z.union([
   galleryColumnSchema.strict(),
   formColumnSchema.strict(),
   pluginColumnSchema.strict(),
+  ganttColumnSchema.strict(),
 ]);
 
 export const columnMetaSchema = z.record(z.string().startsWith(IdPrefix.Field), columnSchema);
@@ -104,6 +127,11 @@ export const columnMetaSchema = z.record(z.string().startsWith(IdPrefix.Field), 
 export const gridColumnMetaSchema = z.record(
   z.string().startsWith(IdPrefix.Field),
   gridColumnSchema
+);
+
+export const ganttColumnMetaSchema = z.record(
+  z.string().startsWith(IdPrefix.Field),
+  ganttColumnSchema
 );
 
 export const kanbanColumnMetaSchema = z.record(
@@ -140,6 +168,7 @@ export const columnMetaRoSchema = z
       .meta({ description: 'Field ID' }),
     columnMeta: z.union([
       gridColumnSchema.partial().strict(),
+      ganttColumnSchema.partial().strict(),
       kanbanColumnSchema.partial().strict(),
       formColumnSchema.partial().strict(),
       pluginColumnSchema.partial().strict(),

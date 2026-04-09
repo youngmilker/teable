@@ -155,6 +155,11 @@ export interface IGridProps extends IGridExternalProps {
   columnHeaderHeight?: number;
   columnStatistics?: IColumnStatistics;
   getCellContent: (cell: ICellItem) => ICell;
+  /**
+   * External hover row index (real/data index) for cross-component hover synchronization.
+   * When set, the grid will highlight this row even if the mouse is outside the grid.
+   */
+  externalHoverRowIndex?: number | null;
 }
 
 export interface IGridRef {
@@ -219,6 +224,7 @@ const GridBase: ForwardRefRenderFunction<IGridRef, IGridProps> = (props, forward
     groupPoints,
     columnHeaderHeight = defaultColumnHeaderHeight,
     getCellContent,
+    externalHoverRowIndex,
     onUndo,
     onRedo,
     onCopy,
@@ -734,6 +740,7 @@ const GridBase: ForwardRefRenderFunction<IGridRef, IGridProps> = (props, forward
             onFillSelection={onFillSelection}
             onRowControlClick={onRowControlClick}
             onRowRangeSelected={onRowRangeSelected}
+            externalHoverRowIndex={externalHoverRowIndex}
           />
         )}
       </div>

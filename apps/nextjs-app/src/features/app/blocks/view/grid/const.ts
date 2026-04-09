@@ -8,4 +8,4 @@ export const GIRD_ROW_HEIGHT_DEFINITIONS = {
   [RowHeightLevel.ExtraTall]: 108,
 };
 
-export const GIRD_FIELD_NAME_HEIGHT_DEFINITIONS = [0, 32, 56, 80];
+export const GIRD_FIELD_NAME_HEIGHT_DEFINITIONS = [0, 32, 56, 80, 104];

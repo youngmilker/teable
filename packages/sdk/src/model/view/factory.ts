@@ -8,6 +8,7 @@ import { GalleryView } from './gallery.view';
 import { GridView } from './grid.view';
 import { KanbanView } from './kanban.view';
 import { PluginView } from './plugin.view';
+import { GanttView } from './gantt.view';
 
 export function createViewInstance(view: IViewVo, doc?: Doc<IViewVo>) {
   const instance = (() => {
@@ -24,6 +25,8 @@ export function createViewInstance(view: IViewVo, doc?: Doc<IViewVo>) {
         return plainToInstance(PluginView, view);
       case ViewType.Calendar:
         return plainToInstance(CalendarView, view);
+      case ViewType.Gantt:
+        return plainToInstance(GanttView, view);
       default:
         assertNever(view.type);
     }

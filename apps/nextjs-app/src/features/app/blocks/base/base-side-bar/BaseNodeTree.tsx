@@ -159,8 +159,9 @@ export const BaseNodeTree = (props: IBaseNodeTreeProps) => {
   const shareUrlPrefix = useShareUrlPrefix();
   const canCreateTable = Boolean(permission?.['table|create']);
   const canCreateDashboard = Boolean(permission?.['base|update'] && !disallowDashboard);
-  const canCreateWorkflow = !isCommunity && Boolean(permission?.['automation|create']);
-  const canCreateApp = !isCommunity && Boolean(aiChatEnabled && permission?.['app|create']);
+  // yangzhouzhen: 目前社区版和企业版都不区分权限，所以先不区分是否社区版，后续如果需要区分再调整
+  const canCreateWorkflow = isCommunity && Boolean(permission?.['automation|create']);
+  const canCreateApp = isCommunity && Boolean(aiChatEnabled && permission?.['app|create']);
   const canCreateFolder = Boolean(permission?.['base|update']);
   const canUpdateTable = Boolean(permission?.['table|update']);
 

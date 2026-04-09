@@ -139,6 +139,7 @@ export const calcCells = (props: ILayoutDrawerProps, renderRegion: RenderRegion)
     groupCollection,
     getLinearRow,
     getCellContent,
+    externalHoverRowIndex,
   } = props;
   const {
     startRowIndex,
@@ -255,10 +256,11 @@ export const calcCells = (props: ILayoutDrawerProps, renderRegion: RenderRegion)
 
       const { displayIndex, realIndex: realRowIndex } = linearRow;
       const isRowHovered =
-        !isOutOfBounds &&
-        !isSelecting &&
-        ROW_RELATED_REGIONS.has(hoverRegionType) &&
-        rowIndex === hoverRowIndex;
+        (!isOutOfBounds &&
+          !isSelecting &&
+          ROW_RELATED_REGIONS.has(hoverRegionType) &&
+          rowIndex === hoverRowIndex) ||
+        (externalHoverRowIndex != null && realRowIndex === externalHoverRowIndex);
       const { isCellActive, isRowActive } = checkIfRowOrCellActive(
         activeCell,
         realRowIndex,
