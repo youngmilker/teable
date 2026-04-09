@@ -27,7 +27,7 @@ export const GridGanttViewBase: React.FC<IGridGanttViewProps> = (props: IGridGan
   const { rowHeight, columnHeaderHeight } = useMemo(() => {
     return {
       rowHeight: GIRD_ROW_HEIGHT_DEFINITIONS[view?.options?.rowHeight ?? RowHeightLevel.Short],
-      columnHeaderHeight: GIRD_FIELD_NAME_HEIGHT_DEFINITIONS[view?.options?.fieldNameDisplayLines ?? 1],
+      columnHeaderHeight: GIRD_FIELD_NAME_HEIGHT_DEFINITIONS[view?.options?.fieldNameDisplayLines ?? 2],
     };
   }, [view?.options?.rowHeight, view?.options?.fieldNameDisplayLines]);
 
