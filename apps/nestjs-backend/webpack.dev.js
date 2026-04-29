@@ -60,12 +60,13 @@ module.exports = function (options, webpack) {
       // nest default tsconfig path is tsconfig.build.json
       ...options.plugins.filter((plugin) => !(plugin instanceof ForkTsCheckerWebpackPlugin)),
       new webpack.HotModuleReplacementPlugin(),
-      new ForkTsCheckerWebpackPlugin({
-        typescript: {
-          configFile: 'tsconfig.json',
-          memoryLimit: 4096,
-        },
-      }),
+      // TODO: fork ts checker plugin is not working, need to investigate
+      // new ForkTsCheckerWebpackPlugin({
+      //   typescript: {
+      //     configFile: 'tsconfig.json',
+      //     memoryLimit: 4096,
+      //   },
+      // }),
       new CopyPlugin({
         patterns: [{ from: 'src/features/mail-sender/templates', to: 'templates' }],
       }),
