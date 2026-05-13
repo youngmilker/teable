@@ -69,6 +69,12 @@ export abstract class FieldCore implements IFieldVo {
    */
   recordCreate?: boolean;
 
+  isSystemField?: boolean;
+
+  systemFieldKey?: string;
+
+  configSource?: IFieldVo['configSource'];
+
   /**
    * some field may store a json type item, we need to know how to convert it to string
    * it has those difference between cellValue2String

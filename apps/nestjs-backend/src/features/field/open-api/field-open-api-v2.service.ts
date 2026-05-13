@@ -1,7 +1,6 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable sonarjs/cognitive-complexity */
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import type { IConvertFieldRo, IFieldRo, IFieldVo, IUpdateFieldRo } from '@teable/core';
 import {
   CellValueType,
   DbFieldType,
@@ -13,10 +12,16 @@ import {
   getDbFieldType,
   ViewOpBuilder,
   ViewType,
-  type IGridColumnMeta,
-  type IGridViewOptions,
-  type IViewVo,
-  type IOtOperation,
+} from '@teable/core';
+import type {
+  IConvertFieldRo,
+  IFieldRo,
+  IFieldVo,
+  IGridColumnMeta,
+  IGridViewOptions,
+  IOtOperation,
+  IUpdateFieldRo,
+  IViewVo,
 } from '@teable/core';
 import type { IDuplicateFieldRo } from '@teable/openapi';
 import {
@@ -45,11 +50,9 @@ import type {
 import { instanceToPlain } from 'class-transformer';
 import { ClsService } from 'nestjs-cls';
 import { CustomHttpException, getDefaultCodeByStatus } from '../../../custom.exception';
+import type { IClsStore } from '../../../types/cls';
 import type { IOpsMap } from '../../calculation/utils/compose-maps';
 import { DataLoaderService } from '../../data-loader/data-loader.service';
-import { FieldOpenApiService } from './field-open-api.service';
-import { ViewService } from '../../view/view.service';
-import { adjustFrozenField } from '../../view/utils/derive-frozen-fields';
 import {
   V2_FIELD_UPDATE_AUDIT_CONTEXT_KEY,
   type IV2FieldUpdateAuditContext,
@@ -64,7 +67,11 @@ import {
   V2_FIELD_CONVERT_UNDO_CONTEXT_KEY,
   type IV2FieldConvertUndoContext,
 } from '../../v2/v2-undo-redo.constants';
-import type { IClsStore } from '../../../types/cls';
+import { adjustFrozenField } from '../../view/utils/derive-frozen-fields';
+import { ViewService } from '../../view/view.service';
+import { FieldOpenApiService } from './field-open-api.service';
+import { assertSystemFieldDebugCreateAllowed } from './system-field-dev-access';
+import { assertSystemFieldUpdateAllowed } from './system-field-protection';
 
 const internalServerError = 'Internal server error';
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -74,7 +81,7 @@ type ConvertFieldExecutionOptions = {
   undoRedoMode?: 'undo' | 'redo' | 'normal';
 };
 
-type GridViewDeleteSnapshot = {
+type IGridViewDeleteSnapshot = {
   viewId: string;
   options: IGridViewOptions;
   columnMeta: IGridColumnMeta;
@@ -119,12 +126,14 @@ export class FieldOpenApiV2Service {
     this.dataLoaderService.field.invalidateTables(ids);
   }
 
-  private async captureGridViewDeleteSnapshots(tableId: string): Promise<GridViewDeleteSnapshot[]> {
+  private async captureGridViewDeleteSnapshots(
+    tableId: string
+  ): Promise<IGridViewDeleteSnapshot[]> {
     const views = await this.viewService.getViews(tableId);
     return views.flatMap((view) => this.toGridViewDeleteSnapshot(view));
   }
 
-  private toGridViewDeleteSnapshot(view: IViewVo): GridViewDeleteSnapshot[] {
+  private toGridViewDeleteSnapshot(view: IViewVo): IGridViewDeleteSnapshot[] {
     if (view.type !== ViewType.Grid && view.type !== ViewType.Gantt) {
       return [];
     }
@@ -141,7 +150,7 @@ export class FieldOpenApiV2Service {
   }
 
   private buildFrozenFieldDeleteOps(
-    viewSnapshots: ReadonlyArray<GridViewDeleteSnapshot>,
+    viewSnapshots: ReadonlyArray<IGridViewDeleteSnapshot>,
     fieldIds: ReadonlyArray<string>
   ): Record<string, IOtOperation[]> {
     const columnMetaUpdate = Object.fromEntries(fieldIds.map((fieldId) => [fieldId, null]));
@@ -174,7 +183,7 @@ export class FieldOpenApiV2Service {
     tableId: string,
     fieldIds: ReadonlyArray<string>,
     payload: Awaited<ReturnType<FieldOpenApiService['captureDeleteFieldsLegacyPayload']>>,
-    gridViewSnapshots: ReadonlyArray<GridViewDeleteSnapshot>
+    gridViewSnapshots: ReadonlyArray<IGridViewDeleteSnapshot>
   ): void {
     (
       context as IExecutionContext & {
@@ -1044,6 +1053,8 @@ export class FieldOpenApiV2Service {
   }
 
   async createField(tableId: string, fieldRo: IFieldRo): Promise<IFieldVo> {
+    assertSystemFieldDebugCreateAllowed(fieldRo);
+
     const container = await this.v2ContainerService.getContainer();
     const commandBus = container.resolve<ICommandBus>(v2CoreTokens.commandBus);
     const tableQueryService = container.resolve<TableQueryService>(v2CoreTokens.tableQueryService);
@@ -1066,6 +1077,17 @@ export class FieldOpenApiV2Service {
 
     const rawFieldRo = fieldRo as Record<string, unknown>;
     const rawDbFieldName = rawFieldRo.dbFieldName;
+    if (
+      typeof rawDbFieldName === 'string' &&
+      rawDbFieldName.startsWith('__') &&
+      fieldRo.isSystemField !== true
+    ) {
+      throw new CustomHttpException(
+        `Db Field name with "__" prefix is reserved for system fields`,
+        getDefaultCodeByStatus(HttpStatus.BAD_REQUEST)
+      );
+    }
+
     if (
       typeof rawDbFieldName === 'string' &&
       this.hasDuplicatedDbFieldName(tableResult.value, rawDbFieldName)
@@ -1329,6 +1351,10 @@ export class FieldOpenApiV2Service {
     const commandBus = container.resolve<ICommandBus>(v2CoreTokens.commandBus);
     const context = await this.v2ContextFactory.createContext();
     const currentField = await this.getFieldFromV2(tableId, fieldId, context);
+
+    if ((currentField as IFieldVo).isSystemField) {
+      assertSystemFieldUpdateAllowed(fieldId, updateFieldRo);
+    }
 
     const v2Input = {
       tableId,

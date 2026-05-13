@@ -129,6 +129,9 @@ export class FieldService implements IReadonlyAdapterService {
       isMultipleCellValue,
       isLookup,
       isConditionalLookup,
+      isSystemField,
+      systemFieldKey,
+      configSource,
     } = fieldInstance;
 
     const agg = await this.prismaService.txClient().field.aggregate({
@@ -169,7 +172,10 @@ export class FieldService implements IReadonlyAdapterService {
       isMultipleCellValue,
       isConditionalLookup,
       createdBy: userId,
-    };
+      ...(isSystemField != null && { isSystemField }),
+      ...(systemFieldKey != null && { systemFieldKey }),
+      ...(configSource != null && { configSource: JSON.stringify(configSource) }),
+    } as Prisma.FieldCreateInput;
 
     const field = await this.prismaService.txClient().field.upsert({
       where: { id: data.id },
@@ -218,39 +224,46 @@ export class FieldService implements IReadonlyAdapterService {
             isMultipleCellValue,
             isLookup,
             isConditionalLookup,
+            isSystemField,
+            systemFieldKey,
+            configSource,
             meta,
           },
           index
-        ) => ({
-          id,
-          name,
-          description,
-          type,
-          aiConfig: aiConfig ? JSON.stringify(aiConfig) : undefined,
-          options: JSON.stringify(options),
-          notNull,
-          unique,
-          isPrimary,
-          order: order + index,
-          version: 1,
-          isComputed,
-          isLookup,
-          isConditionalLookup,
-          hasError,
-          // add lookupLinkedFieldId for indexing
-          lookupLinkedFieldId:
-            lookupOptions && isLinkLookupOptions(lookupOptions)
-              ? lookupOptions.linkFieldId
-              : undefined,
-          lookupOptions: lookupOptions && JSON.stringify(lookupOptions),
-          dbFieldName,
-          dbFieldType,
-          cellValueType,
-          isMultipleCellValue,
-          createdBy: userId,
-          meta: meta ? JSON.stringify(meta) : undefined,
-          tableId,
-        })
+        ) =>
+          ({
+            id,
+            name,
+            description,
+            type,
+            aiConfig: aiConfig ? JSON.stringify(aiConfig) : undefined,
+            options: JSON.stringify(options),
+            notNull,
+            unique,
+            isPrimary,
+            order: order + index,
+            version: 1,
+            isComputed,
+            isLookup,
+            isConditionalLookup,
+            hasError,
+            // add lookupLinkedFieldId for indexing
+            lookupLinkedFieldId:
+              lookupOptions && isLinkLookupOptions(lookupOptions)
+                ? lookupOptions.linkFieldId
+                : undefined,
+            lookupOptions: lookupOptions && JSON.stringify(lookupOptions),
+            dbFieldName,
+            dbFieldType,
+            cellValueType,
+            isMultipleCellValue,
+            createdBy: userId,
+            meta: meta ? JSON.stringify(meta) : undefined,
+            tableId,
+            ...(isSystemField != null && { isSystemField }),
+            ...(systemFieldKey != null && { systemFieldKey }),
+            ...(configSource != null && { configSource: JSON.stringify(configSource) }),
+          }) as Prisma.FieldCreateManyInput
       );
 
     const result = await this.prismaService.txClient().field.createMany({
@@ -302,6 +315,9 @@ export class FieldService implements IReadonlyAdapterService {
           isMultipleCellValue,
           isLookup,
           isConditionalLookup,
+          isSystemField,
+          systemFieldKey,
+          configSource,
           meta,
           dbFieldName,
         } = fieldInstance;
@@ -333,7 +349,10 @@ export class FieldService implements IReadonlyAdapterService {
           isMultipleCellValue,
           createdBy: userId,
           tableId,
-        };
+          ...(isSystemField != null && { isSystemField }),
+          ...(systemFieldKey != null && { systemFieldKey }),
+          ...(configSource != null && { configSource: JSON.stringify(configSource) }),
+        } as Prisma.FieldCreateManyInput;
       });
 
       await prisma.field.createMany({ data });
@@ -364,6 +383,9 @@ export class FieldService implements IReadonlyAdapterService {
         isMultipleCellValue,
         isLookup,
         isConditionalLookup,
+        isSystemField,
+        systemFieldKey,
+        configSource,
       } = fieldInstance;
 
       const data: Prisma.FieldCreateInput = {
@@ -399,7 +421,10 @@ export class FieldService implements IReadonlyAdapterService {
         isMultipleCellValue,
         isConditionalLookup,
         createdBy: userId,
-      };
+        ...(isSystemField != null && { isSystemField }),
+        ...(systemFieldKey != null && { systemFieldKey }),
+        ...(configSource != null && { configSource: JSON.stringify(configSource) }),
+      } as Prisma.FieldCreateInput;
 
       const field = await prisma.field.upsert({
         where: { id: data.id },
@@ -1329,7 +1354,21 @@ export class FieldService implements IReadonlyAdapterService {
       await this.alterTableModifyFieldValidation(fieldId, key, newValue as boolean | undefined);
     }
 
-    return { [key]: newValue ?? null };
+    if (key === 'isSystemField') {
+      return typeof newValue === 'boolean' ? { isSystemField: newValue } : {};
+    }
+
+    if (key === 'systemFieldKey') {
+      return newValue === undefined ? {} : { systemFieldKey: (newValue as string | null) ?? null };
+    }
+
+    if (key === 'configSource') {
+      return newValue === undefined
+        ? {}
+        : { configSource: newValue ? JSON.stringify(newValue) : null };
+    }
+
+    return newValue === undefined ? {} : { [key]: newValue };
   }
 
   private async updateStrategies(

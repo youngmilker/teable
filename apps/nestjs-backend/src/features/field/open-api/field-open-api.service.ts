@@ -78,11 +78,16 @@ import { FieldViewSyncService } from '../field-calculate/field-view-sync.service
 import { FieldService } from '../field.service';
 import type { IFieldInstance } from '../model/factory';
 import {
-  convertFieldInstanceToFieldVo,
   createFieldInstanceByRaw,
   createFieldInstanceByVo,
   rawField2FieldObj,
 } from '../model/factory';
+import { assertSystemFieldDebugCreateAllowed } from './system-field-dev-access';
+import { SystemFieldLifecycleService } from './system-field-lifecycle.service';
+import {
+  assertSystemFieldDeleteAllowed,
+  assertSystemFieldUpdateAllowed,
+} from './system-field-protection';
 
 type FieldDeleteDependencyContext = {
   tableId: string;
@@ -132,7 +137,8 @@ export class FieldOpenApiService {
     @InjectModel('CUSTOM_KNEX') private readonly knex: Knex,
     @ThresholdConfig() private readonly thresholdConfig: IThresholdConfig,
     @InjectRecordQueryBuilder() private readonly recordQueryBuilder: IRecordQueryBuilder,
-    private readonly computedOrchestrator: ComputedOrchestratorService
+    private readonly computedOrchestrator: ComputedOrchestratorService,
+    private readonly systemFieldLifecycleService: SystemFieldLifecycleService
   ) {}
 
   async planField(tableId: string, fieldId: string) {
@@ -1299,6 +1305,11 @@ export class FieldOpenApiService {
         throw new NotFoundException(`Field ${notExistFieldId} not found`);
       }
 
+      const systemField = fieldRaws.find((raw) => raw.isSystemField);
+      if (systemField) {
+        assertSystemFieldDeleteAllowed(systemField.id);
+      }
+
       const fieldVos = fieldIds.map((id) => rawField2FieldObj(fieldRawMap.get(id)!));
       const fieldInstances = fieldVos.map(createFieldInstanceByVo);
       const nonComputedFields = fieldInstances.filter((field) => !field.isComputed);
@@ -1334,6 +1345,8 @@ export class FieldOpenApiService {
 
   @Timing()
   async createField(tableId: string, fieldRo: IFieldRo, windowId?: string) {
+    assertSystemFieldDebugCreateAllowed(fieldRo);
+
     const fieldVo = await this.fieldSupplementService.prepareCreateField(tableId, fieldRo);
     const fieldInstance = createFieldInstanceByVo(fieldVo);
     const columnMeta = fieldRo.order && {
@@ -1367,6 +1380,16 @@ export class FieldOpenApiService {
             }
           }
         );
+
+        await this.systemFieldLifecycleService.onFieldCreated({
+          tableId,
+          fieldVo,
+          windowId,
+          syncField: async (tid, fieldId, convertRo) => {
+            await this.convertField(tid, fieldId, convertRo, undefined, { internal: true });
+          },
+        });
+
         return created;
       },
       { timeout: this.thresholdConfig.bigTransactionTimeout }
@@ -1376,14 +1399,10 @@ export class FieldOpenApiService {
       await this.tableIndexService.createSearchFieldSingleIndex(tid, field);
     }
 
-    const referenceMap = await this.getFieldReferenceMap([fieldVo.id]);
-
-    // Prefer emitting a VO converted from the created instance so computed props (e.g. recordRead)
-    // are included consistently with snapshots.
-    const createdMain = newFields.find(
-      (nf) => nf.tableId === tableId && nf.field.id === fieldVo.id
-    );
-    const emitFieldVo = createdMain ? convertFieldInstanceToFieldVo(createdMain.field) : fieldVo;
+    const [referenceMap, emitFieldVo] = await Promise.all([
+      this.getFieldReferenceMap([fieldVo.id]),
+      this.fieldService.getField(tableId, fieldVo.id),
+    ]);
 
     this.eventEmitterService.emitAsync(Events.OPERATION_FIELDS_CREATE, {
       windowId,
@@ -1398,7 +1417,7 @@ export class FieldOpenApiService {
       ],
     });
 
-    return fieldVo;
+    return emitFieldVo;
   }
 
   @Timing()
@@ -1413,6 +1432,12 @@ export class FieldOpenApiService {
         if (fieldRawMap.size !== fieldIds.length) {
           const notExistFieldId = fieldIds.find((id) => !fieldRawMap.has(id));
           throw new NotFoundException(`Field ${notExistFieldId} not found`);
+        }
+
+        for (const raw of fieldRaws) {
+          if ((raw as Record<string, unknown>).isSystemField) {
+            assertSystemFieldDeleteAllowed(raw.id);
+          }
         }
 
         const fieldVoList = fieldIds.map((id) => rawField2FieldObj(fieldRawMap.get(id)!));
@@ -1522,6 +1547,19 @@ export class FieldOpenApiService {
   }
 
   async updateField(tableId: string, fieldId: string, updateFieldRo: IUpdateFieldRo) {
+    const fieldRaw = await this.prismaService.field.findFirst({
+      where: { id: fieldId, deletedTime: null },
+      select: { isSystemField: true },
+    });
+
+    if (!fieldRaw) {
+      throw new NotFoundException(`Field ${fieldId} not found`);
+    }
+
+    if (fieldRaw.isSystemField) {
+      assertSystemFieldUpdateAllowed(fieldId, updateFieldRo);
+    }
+
     const ops: IOtOperation[] = [];
     if (updateFieldRo.name) {
       const op = await this.updateUniqProperty(tableId, fieldId, 'name', updateFieldRo.name);
@@ -1735,8 +1773,18 @@ export class FieldOpenApiService {
     tableId: string,
     fieldId: string,
     updateFieldRo: IConvertFieldRo,
-    windowId?: string
+    windowId?: string,
+    opts?: { internal?: boolean }
   ): Promise<IFieldVo> {
+    if (!opts?.internal) {
+      const fieldRaw = await this.prismaService.txClient().field.findFirst({
+        where: { id: fieldId, deletedTime: null },
+      });
+      if (fieldRaw?.isSystemField) {
+        assertSystemFieldUpdateAllowed(fieldId, updateFieldRo);
+      }
+    }
+
     const { oldFieldVo, newFieldVo, modifiedOps, references, supplementChange } =
       await this.prismaService.$tx(
         async () => {

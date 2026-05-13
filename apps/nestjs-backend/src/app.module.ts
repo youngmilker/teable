@@ -26,6 +26,7 @@ import { HealthModule } from './features/health/health.module';
 import { ImportOpenApiModule } from './features/import/open-api/import-open-api.module';
 import { IntegrityModule } from './features/integrity/integrity.module';
 import { InvitationModule } from './features/invitation/invitation.module';
+import { IterationModule } from './features/iteration/iteration.module';
 import { MailSenderOpenApiModule } from './features/mail-sender/open-api/mail-sender-open-api.module';
 import { MailSenderMergeModule } from './features/mail-sender/open-api/mail-sender.merge.module';
 import { NextModule } from './features/next/next.module';
@@ -83,6 +84,7 @@ export const appModules = {
     SpaceModule,
     CollaboratorModule,
     InvitationModule,
+    IterationModule,
     ShareModule,
     BaseShareModule,
     NotificationModule,

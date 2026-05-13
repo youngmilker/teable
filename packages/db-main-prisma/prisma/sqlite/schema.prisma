@@ -101,6 +101,9 @@ model Field {
   isComputed          Boolean?  @map("is_computed")
   isLookup            Boolean?  @map("is_lookup")
   isConditionalLookup Boolean?  @map("is_conditional_lookup")
+  isSystemField       Boolean   @default(false) @map("is_system_field")
+  systemFieldKey      String?   @map("system_field_key")
+  configSource        String?   @map("config_source")
   isPending           Boolean?  @map("is_pending")
   hasError            Boolean?  @map("has_error")
   // the link field id that a lookup field is linked to
@@ -842,4 +845,25 @@ model BaseShare {
 
   @@index([baseId])
   @@map("base_share")
+}
+
+model Iteration {
+  id               String    @id @default(cuid())
+  spaceId          String    @map("space_id")
+  name             String
+  description      String?
+  color            String?
+  startTime        DateTime? @map("start_time")
+  endTime          DateTime? @map("end_time")
+  isFirst          Boolean   @default(false) @map("is_first")
+  sortOrder        Float?    @map("sort_order")
+  createdTime      DateTime  @default(now()) @map("created_time")
+  lastModifiedTime DateTime? @updatedAt @map("last_modified_time")
+  deletedTime      DateTime? @map("deleted_time")
+  createdBy        String    @map("created_by")
+  lastModifiedBy   String?   @map("last_modified_by")
+
+  @@index([spaceId, deletedTime])
+  @@index([sortOrder])
+  @@map("iteration")
 }

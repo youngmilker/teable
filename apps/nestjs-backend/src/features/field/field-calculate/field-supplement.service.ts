@@ -1710,6 +1710,13 @@ export class FieldSupplementService {
       fieldRo.dbFieldName ?? (await this.fieldService.generateDbFieldName(tableId, fieldName));
 
     if (fieldRo.dbFieldName) {
+      if (fieldRo.dbFieldName.startsWith('__') && !fieldRo.isSystemField) {
+        throw new CustomHttpException(
+          `Db Field name with "__" prefix is reserved for system fields`,
+          HttpErrorCode.VALIDATION_ERROR
+        );
+      }
+
       const existField = await this.prismaService.txClient().field.findFirst({
         where: { tableId, dbFieldName: fieldRo.dbFieldName, deletedTime: null },
         select: { id: true },

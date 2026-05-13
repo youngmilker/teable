@@ -14,9 +14,12 @@ import { ViewOpenApiModule } from '../../view/open-api/view-open-api.module';
 import { ViewModule } from '../../view/view.module';
 import { FieldCalculateModule } from '../field-calculate/field-calculate.module';
 import { FieldModule } from '../field.module';
-import { FieldOpenApiController } from './field-open-api.controller';
 import { FieldOpenApiV2Service } from './field-open-api-v2.service';
+import { FieldOpenApiController } from './field-open-api.controller';
 import { FieldOpenApiService } from './field-open-api.service';
+import { ConfigSourceFieldSyncService } from './config-source-field-sync.service';
+import { IterationConfigSourceProvider } from './iteration-config-source.provider';
+import { SystemFieldLifecycleService } from './system-field-lifecycle.service';
 
 @Module({
   imports: [
@@ -35,7 +38,15 @@ import { FieldOpenApiService } from './field-open-api.service';
     CanaryModule,
   ],
   controllers: [FieldOpenApiController],
-  providers: [DbProvider, FieldOpenApiService, FieldOpenApiV2Service, TableIndexService],
-  exports: [FieldOpenApiService, FieldOpenApiV2Service],
+  providers: [
+    DbProvider,
+    FieldOpenApiService,
+    FieldOpenApiV2Service,
+    SystemFieldLifecycleService,
+    ConfigSourceFieldSyncService,
+    IterationConfigSourceProvider,
+    TableIndexService,
+  ],
+  exports: [FieldOpenApiService, FieldOpenApiV2Service, ConfigSourceFieldSyncService],
 })
 export class FieldOpenApiModule {}

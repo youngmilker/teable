@@ -141,6 +141,27 @@ export const fieldVoSchema = z.object({
     description:
       'Field record create permission. When set to false, creating records is denied. When true or not set, creating records is allowed.',
   }),
+
+  isSystemField: z.boolean().optional().meta({
+    description:
+      'Whether this field is a system field. System fields are protected from deletion and critical property changes.',
+  }),
+
+  systemFieldKey: z.string().optional().meta({
+    description:
+      'The logical system field key (e.g. title, assignee, iteration). Used by templates and automation rules.',
+  }),
+
+  configSource: z
+    .object({
+      type: z.enum(['iteration', 'department']),
+      spaceId: z.string(),
+    })
+    .optional()
+    .meta({
+      description:
+        'Declares that this field options are sourced from a space-level configuration module.',
+    }),
 });
 
 export type IFieldVo = z.infer<typeof fieldVoSchema>;
@@ -156,6 +177,9 @@ export const FIELD_RO_PROPERTIES = [
   'description',
   'lookupOptions',
   'options',
+  'isSystemField',
+  'systemFieldKey',
+  'configSource',
 ] as const;
 
 export const FIELD_VO_PROPERTIES = [
@@ -180,6 +204,9 @@ export const FIELD_VO_PROPERTIES = [
   'dbFieldName',
   'recordRead',
   'recordCreate',
+  'isSystemField',
+  'systemFieldKey',
+  'configSource',
 ] as const;
 
 /**
@@ -294,6 +321,9 @@ const baseFieldRoSchema = fieldVoSchema
     isLookup: true,
     isConditionalLookup: true,
     description: true,
+    isSystemField: true,
+    systemFieldKey: true,
+    configSource: true,
   })
   .required({
     type: true,

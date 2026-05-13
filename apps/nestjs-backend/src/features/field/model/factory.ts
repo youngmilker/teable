@@ -29,6 +29,18 @@ import { SingleLineTextFieldDto } from './field-dto/single-line-text-field.dto';
 import { SingleSelectFieldDto } from './field-dto/single-select-field.dto';
 import { UserFieldDto } from './field-dto/user-field.dto';
 
+function parseConfigSource(configSource?: string | null): IFieldVo['configSource'] | undefined {
+  if (!configSource) {
+    return undefined;
+  }
+
+  try {
+    return JSON.parse(configSource) as IFieldVo['configSource'];
+  } catch {
+    return undefined;
+  }
+}
+
 // eslint-disable-next-line sonarjs/cognitive-complexity
 export function rawField2FieldObj(fieldRaw: Field): IFieldVo {
   let options = fieldRaw.options && JSON.parse(fieldRaw.options as string);
@@ -67,6 +79,9 @@ export function rawField2FieldObj(fieldRaw: Field): IFieldVo {
     cellValueType: fieldRaw.cellValueType as CellValueType,
     isMultipleCellValue: fieldRaw.isMultipleCellValue ?? undefined,
     dbFieldType: fieldRaw.dbFieldType as DbFieldType,
+    isSystemField: fieldRaw.isSystemField || undefined,
+    systemFieldKey: fieldRaw.systemFieldKey || undefined,
+    configSource: parseConfigSource(fieldRaw.configSource),
   };
 }
 
@@ -94,6 +109,9 @@ export function fieldCore2FieldInstance(field: FieldCore): IFieldInstance {
     dbFieldType: field.dbFieldType,
     recordRead: field.recordRead,
     recordCreate: field.recordCreate,
+    isSystemField: field.isSystemField,
+    systemFieldKey: field.systemFieldKey,
+    configSource: field.configSource,
   };
 
   return createFieldInstanceByVo(plain);
