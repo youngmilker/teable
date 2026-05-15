@@ -82,12 +82,12 @@ import {
   createFieldInstanceByVo,
   rawField2FieldObj,
 } from '../model/factory';
-import { assertSystemFieldDebugCreateAllowed } from './system-field-dev-access';
-import { SystemFieldLifecycleService } from './system-field-lifecycle.service';
+import { assertSystemFieldDebugCreateAllowed } from './system-field/system-field-dev-access';
+import { SystemFieldLifecycleService } from './system-field/system-field-lifecycle.service';
 import {
   assertSystemFieldDeleteAllowed,
   assertSystemFieldUpdateAllowed,
-} from './system-field-protection';
+} from './system-field/system-field-protection';
 
 type FieldDeleteDependencyContext = {
   tableId: string;

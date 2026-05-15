@@ -70,8 +70,8 @@ import {
 import { adjustFrozenField } from '../../view/utils/derive-frozen-fields';
 import { ViewService } from '../../view/view.service';
 import { FieldOpenApiService } from './field-open-api.service';
-import { assertSystemFieldDebugCreateAllowed } from './system-field-dev-access';
-import { assertSystemFieldUpdateAllowed } from './system-field-protection';
+import { assertSystemFieldDebugCreateAllowed } from './system-field/system-field-dev-access';
+import { assertSystemFieldUpdateAllowed } from './system-field/system-field-protection';
 
 const internalServerError = 'Internal server error';
 // eslint-disable-next-line @typescript-eslint/naming-convention

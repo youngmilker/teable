@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import {
   ConfigSourceFieldSyncFailedError,
   ConfigSourceFieldSyncService,
-} from '../field/open-api/config-source-field-sync.service';
+} from '../field/open-api/config-source/config-source-field-sync.service';
 import { FieldOpenApiService } from '../field/open-api/field-open-api.service';
 
 export class IterationFieldSyncFailedError extends Error {

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { ConfigSourceFieldSyncFailedError } from '../field/open-api/config-source-field-sync.service';
+import { ConfigSourceFieldSyncFailedError } from '../field/open-api/config-source/config-source-field-sync.service';
 import { IterationFieldSyncFailedError, IterationSyncService } from './iteration-sync.service';
 
 const spaceId = 'spc1';
